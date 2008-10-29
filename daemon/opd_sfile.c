@@ -199,14 +199,6 @@ create_sfile(unsigned long hash, struct transient const * trans,
 
 	sf->ignored = is_sf_ignored(sf);
 
-	sf->embedded_offset = trans->embedded_offset;
-
-	/* If embedded_offset is a valid value, it means we're
-	 * processing a Cell BE SPU profile; in which case, we
-	 * want sf->app_cookie to hold trans->app_cookie.
-	 */
-	if (trans->embedded_offset != UNUSED_EMBEDDED_OFFSET)
-		sf->app_cookie = trans->app_cookie;
 	return sf;
 }
 
@@ -407,7 +399,7 @@ static void sfile_log_arc(struct transient const * trans)
 	key = to & (0xffffffff);
 	key |= ((uint64_t)from) << 32;
 
-	err = odb_update_node(file, key);
+	err = odb_insert(file, key, 1);
 	if (err) {
 		fprintf(stderr, "%s: %s\n", __FUNCTION__, strerror(err));
 		abort();
@@ -446,7 +438,7 @@ void sfile_log_sample(struct transient const * trans)
 		return;
 	}
 
-	err = odb_update_node(file, (uint64_t)pc);
+	err = odb_insert(file, (uint64_t)pc, 1);
 	if (err) {
 		fprintf(stderr, "%s: %s\n", __FUNCTION__, strerror(err));
 		abort();
@@ -454,7 +446,7 @@ void sfile_log_sample(struct transient const * trans)
 }
 
 
-static int close_sfile(struct sfile * sf, void * data __attribute__((unused)))
+static int close_sfile(struct sfile * sf)
 {
 	size_t i;
 
@@ -468,13 +460,13 @@ static int close_sfile(struct sfile * sf, void * data __attribute__((unused)))
 
 static void kill_sfile(struct sfile * sf)
 {
-	close_sfile(sf, NULL);
+	close_sfile(sf);
 	list_del(&sf->hash);
 	list_del(&sf->lru);
 }
 
 
-static int sync_sfile(struct sfile * sf, void * data __attribute__((unused)))
+static int sync_sfile(struct sfile * sf)
 {
 	size_t i;
 
@@ -485,25 +477,22 @@ static int sync_sfile(struct sfile * sf, void * data __attribute__((unused)))
 }
 
 
-static int is_sfile_kernel(struct sfile * sf, void * data __attribute__((unused)))
+static int is_sfile_kernel(struct sfile * sf)
 {
 	return !!sf->kernel;
 }
 
 
-static int is_sfile_anon(struct sfile * sf, void * data)
+static int is_sfile_anon(struct sfile * sf)
 {
-	return sf->anon == data;
+	return !!sf->anon;
 }
 
 
-typedef int (*sfile_func)(struct sfile *, void *);
-
-static void
-for_one_sfile(struct sfile * sf, sfile_func func, void * data)
+static void for_one_sfile(struct sfile * sf, int (*func)(struct sfile *))
 {
 	size_t i;
-	int free_sf = func(sf, data);
+	int free_sf = func(sf);
 
 	for (i = 0; i < CG_HASH_SIZE; ++i) {
 		struct list_head * pos;
@@ -511,7 +500,7 @@ for_one_sfile(struct sfile * sf, sfile_func func, void * data)
 		list_for_each_safe(pos, pos2, &sf->cg_hash[i]) {
 			struct cg_entry * cg =
 				list_entry(pos, struct cg_entry, hash);
-			if (free_sf || func(&cg->to, data)) {
+			if (free_sf || func(&cg->to)) {
 				kill_sfile(&cg->to);
 				list_del(&cg->hash);
 				free(cg);
@@ -526,39 +515,39 @@ for_one_sfile(struct sfile * sf, sfile_func func, void * data)
 }
 
 
-static void for_each_sfile(sfile_func func, void * data)
+static void for_each_sfile(int (*func)(struct sfile *))
 {
 	struct list_head * pos;
 	struct list_head * pos2;
 
 	list_for_each_safe(pos, pos2, &lru_list) {
 		struct sfile * sf = list_entry(pos, struct sfile, lru);
-		for_one_sfile(sf, func, data);
+		for_one_sfile(sf, func);
 	}
 }
 
 
 void sfile_clear_kernel(void)
 {
-	for_each_sfile(is_sfile_kernel, NULL);
+	for_each_sfile(is_sfile_kernel);
 }
 
 
-void sfile_clear_anon(struct anon_mapping * anon)
+void sfile_clear_anon(void)
 {
-	for_each_sfile(is_sfile_anon, anon);
+	for_each_sfile(is_sfile_anon);
 }
 
 
 void sfile_sync_files(void)
 {
-	for_each_sfile(sync_sfile, NULL);
+	for_each_sfile(sync_sfile);
 }
 
 
 void sfile_close_files(void)
 {
-	for_each_sfile(close_sfile, NULL);
+	for_each_sfile(close_sfile);
 }
 
 
@@ -589,7 +578,7 @@ int sfile_lru_clear(void)
 		if (!--amount)
 			break;
 		sf = list_entry(pos, struct sfile, lru);
-		for_one_sfile(sf, (sfile_func)always_true, NULL);
+		for_one_sfile(sf, (int (*)(struct sfile *))always_true);
 	}
 
 	return 0;

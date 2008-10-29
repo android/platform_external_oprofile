@@ -14,7 +14,6 @@
  * @remark Read the file COPYING
  *
  * @author John Levon
- * @Modifications Gisle Dankel
  */
 
 #include "opd_anon.h"
@@ -26,24 +25,21 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
 #define HASH_SIZE 1024
 #define HASH_BITS (HASH_SIZE - 1)
 
-/*
- * Note that this value is tempered by the fact that when we miss in the
- * anon cache, we'll tear down all the mappings for that tgid. Thus, LRU
- * of a mapping can potentially clear out a much larger number of
- * mappings.
- */
-#define LRU_SIZE 8192
-#define LRU_AMOUNT (LRU_SIZE/8)
+#define LRU_SIZE 1000
+#define LRU_AMOUNT (LRU_SIZE/5)
 
 static struct list_head hashes[HASH_SIZE];
 static struct list_head lru;
 static size_t nr_lru;
 
+/* never called in buffer-processing context, so we don't need
+ * to update struct transient. Note the 'U' of LRU is based on
+ * parsing time, not actual use.
+ */
 static void do_lru(struct transient * trans)
 {
 	size_t nr_to_kill = LRU_AMOUNT;
@@ -57,7 +53,6 @@ static void do_lru(struct transient * trans)
 			clear_trans_current(trans);
 		if (trans->last_anon == entry)
 			clear_trans_last(trans);
-		sfile_clear_anon(entry);
 		list_del(&entry->list);
 		list_del(&entry->lru_list);
 		--nr_lru;
@@ -65,6 +60,8 @@ static void do_lru(struct transient * trans)
 		if (nr_to_kill-- == 0)
 			break;
 	}
+
+	sfile_clear_anon();
 }
 
 
@@ -90,7 +87,6 @@ static void clear_anon_maps(struct transient * trans)
 		if (entry->tgid == tgid && entry->app_cookie == app) {
 			if (trans->last_anon == entry)
 				clear_trans_last(trans);
-			sfile_clear_anon(entry);
 			list_del(&entry->list);
 			list_del(&entry->lru_list);
 			--nr_lru;
@@ -98,6 +94,7 @@ static void clear_anon_maps(struct transient * trans)
 		}
 	}
 
+	sfile_clear_anon();
 	if (vmisc) {
 		char const * name = verbose_cookie(app);
 		printf("Cleared anon maps for tgid %u (%s).\n", tgid, name);
@@ -106,7 +103,7 @@ static void clear_anon_maps(struct transient * trans)
 
 
 static void
-add_anon_mapping(struct transient * trans, vma_t start, vma_t end, char * name)
+add_anon_mapping(struct transient * trans, vma_t start, vma_t end)
 {
 	unsigned long hash = hash_anon(trans->tgid, trans->app_cookie);
 	struct anon_mapping * m = xmalloc(sizeof(struct anon_mapping));
@@ -114,7 +111,6 @@ add_anon_mapping(struct transient * trans, vma_t start, vma_t end, char * name)
 	m->app_cookie = trans->app_cookie;
 	m->start = start;
 	m->end = end;
-	strncpy(m->name, name, MAX_IMAGE_NAME_SIZE + 1);
 	list_add_tail(&m->list, &hashes[hash]);
 	list_add_tail(&m->lru_list, &lru);
 	if (++nr_lru == LRU_SIZE)
@@ -132,7 +128,8 @@ static void get_anon_maps(struct transient * trans)
 {
 	FILE * fp = NULL;
 	char buf[PATH_MAX];
-	vma_t start, end;
+	unsigned long start;
+	unsigned long end;
 	int ret;
 
 	snprintf(buf, PATH_MAX, "/proc/%d/maps", trans->tgid);
@@ -141,20 +138,16 @@ static void get_anon_maps(struct transient * trans)
 		return;
 
 	while (fgets(buf, PATH_MAX, fp) != NULL) {
-		char tmp[MAX_IMAGE_NAME_SIZE + 1];
-		char name[MAX_IMAGE_NAME_SIZE + 1];
-		/* Some anon maps have labels like
-		 * [heap], [stack], [vdso], [vsyscall] ...
-		 * Keep track of these labels. If a map has no name, call it "anon".
-		 * Ignore all mappings starting with "/" (file or shared memory object)
+		char tmp[20];
+		/* Note that this actually includes all mappings,
+		 * since we want stuff like [heap]
 		 */
-		strcpy(name, "anon");
-		ret = sscanf(buf, "%llx-%llx %20s %20s %20s %20s %20s",
-		             &start, &end, tmp, tmp, tmp, tmp, name);
-		if (ret < 6 || name[0] == '/')
+		ret = sscanf(buf, "%lx-%lx %19s %19s %19s %19s %19s",
+		             &start, &end, tmp, tmp, tmp, tmp, tmp);
+		if (ret < 6)
 			continue;
 
-		add_anon_mapping(trans, start, end, name);
+		add_anon_mapping(trans, start, end);
 	}
 
 	fclose(fp);

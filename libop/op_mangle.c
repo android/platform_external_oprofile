@@ -19,14 +19,12 @@
 #include "op_sample_file.h"
 #include "op_config.h"
 
-static void append_image(char * dest, int flags, int anon, char const * name, char const * anon_name)
+static void append_image(char * dest, int flags, int anon, char const * name)
 {
 	if ((flags & MANGLE_KERNEL) && !strchr(name, '/')) {
 		strcat(dest, "{kern}/");
 	} else if (anon) {
-		strcat(dest, "{anon:");
-		strcat(dest, anon_name);
-		strcat(dest,"}/");
+		strcat(dest, "{anon}/");
 	} else {
 		strcat(dest, "{root}/");
 	}
@@ -46,18 +44,14 @@ char * op_mangle_filename(struct mangle_values const * values)
 	 * them), see P:3, FIXME: this is a bit weirds, we prolly need to
 	 * reword pp_interface */
 	char const * image_name = values->dep_name;
-	char const * anon_name = values->anon_name;
 	char const * dep_name = values->image_name;
 	char const * cg_image_name = values->cg_image_name;
 
-	len = strlen(op_samples_current_dir) + strlen(dep_name) + 1
-		+ strlen(values->event_name) + 1 + strlen(image_name) + 1;
+	len = strlen(OP_SAMPLES_CURRENT_DIR) + strlen(dep_name) + 1
+	             + strlen(values->event_name) + 1 + strlen(image_name) + 1;
 
 	if (values->flags & MANGLE_CALLGRAPH)
 		len += strlen(cg_image_name) + 1;
-
-	if (anon || cg_anon)
-		len += strlen(anon_name);
 
 	/* provision for tgid, tid, unit_mask, cpu and some {root}, {dep},
 	 * {kern}, {anon} and {cg} marker */
@@ -66,16 +60,15 @@ char * op_mangle_filename(struct mangle_values const * values)
 
 	mangled = xmalloc(len);
 
-	strcpy(mangled, op_samples_current_dir);
-	append_image(mangled, values->flags, 0, image_name, anon_name);
+	strcpy(mangled, OP_SAMPLES_CURRENT_DIR);
+	append_image(mangled, values->flags, 0, image_name);
 
 	strcat(mangled, "{dep}" "/");
-	append_image(mangled, values->flags, anon, dep_name, anon_name);
+	append_image(mangled, values->flags, anon, dep_name);
 
 	if (values->flags & MANGLE_CALLGRAPH) {
 		strcat(mangled, "{cg}" "/");
-		append_image(mangled, values->flags, cg_anon,
-		             cg_image_name, anon_name);
+		append_image(mangled, values->flags, cg_anon, cg_image_name);
 	}
 
 	strcat(mangled, values->event_name);

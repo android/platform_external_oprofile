@@ -5,7 +5,7 @@ LOCAL_SRC_FILES:= \
 	opcontrol.cpp
 
 LOCAL_STATIC_LIBRARIES := \
-	libpopt libutil libdb libabi libop
+	libpopt libutil libdb libabic libop
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/.. \

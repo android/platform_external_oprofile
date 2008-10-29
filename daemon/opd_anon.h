@@ -25,9 +25,6 @@ struct transient;
  */
 #define VMA_SHIFT 13 
 
-/* Maximum size of the image name considered */
-#define MAX_IMAGE_NAME_SIZE 20
-
 struct anon_mapping {
 	/** start of the mapping */
 	vma_t start;
@@ -41,7 +38,6 @@ struct anon_mapping {
 	struct list_head list;
 	/** lru list */
 	struct list_head lru_list;
-	char name[MAX_IMAGE_NAME_SIZE+1];
 };
 
 /**
