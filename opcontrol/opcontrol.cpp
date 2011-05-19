@@ -477,6 +477,9 @@ int read_num(const char* file)
     int fd = open(file, O_RDONLY);
     if (fd<0) return -1;
     int rd = read(fd, buffer, sizeof(buffer)-1);
+    close(fd);
+    if (rd < 0)
+        return -1;
     buffer[rd] = 0;
     return atoi(buffer);
 }
