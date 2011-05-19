@@ -216,7 +216,7 @@ event:0X0203 counters:3 um:zero minimum:1000 name:PM_PTEG_RELOAD_VALID_GRP32 : (
 
 #Group 33 pm_data_tablewalk, Data tablewalks
 event:0X0210 counters:0 um:zero minimum:1000 name:PM_DATA_PTEG_1ST_HALF_GRP33 : (Group 33 pm_data_tablewalk) Data table walk matched in first half primary PTEG
-event:0X0211 counters:1 um:zero minimum:1000 name:PM_DATA_PTEG_2ND_HALF_GRP33 : (Group 33 pm_data_tablewalk) Data table walk matched in second half pri­mary PTEG
+event:0X0211 counters:1 um:zero minimum:1000 name:PM_DATA_PTEG_2ND_HALF_GRP33 : (Group 33 pm_data_tablewalk) Data table walk matched in second half primary PTEG
 event:0X0212 counters:2 um:zero minimum:1000 name:PM_DATA_PTEG_SECONDARY_GRP33 : (Group 33 pm_data_tablewalk) Data table walk matched in secondary PTEG
 event:0X0213 counters:3 um:zero minimum:1000 name:PM_TLB_REF_GRP33 : (Group 33 pm_data_tablewalk) TLB reference
 

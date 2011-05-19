@@ -20,21 +20,37 @@
 #include <fstream>
 #include <algorithm>
 
+#if QT3_SUPPORT
+#include <Qt/qlineedit.h>
+#include <Qt/qcheckbox.h>
+#include <Qt/qtabwidget.h>
+#include <Qt/qmessagebox.h>
+#include <Qt/qvalidator.h>
+#include <Qt/qlabel.h>
+#include <Qt/qpushbutton.h>
+#include <Qt/q3listview.h>
+#include <Qt/q3combobox.h>
+#include <Qt/q3listbox.h>
+#include <Qt/q3filedialog.h>
+#include <Qt/q3buttongroup.h>
+#include <Qt/q3header.h>
+#else
 #include <qlineedit.h>
-#include <qlistview.h>
-#include <qcombobox.h>
-#include <qlistbox.h>
-#include <qfiledialog.h>
-#include <qbuttongroup.h>
 #include <qcheckbox.h>
 #include <qtabwidget.h>
 #include <qmessagebox.h>
 #include <qvalidator.h>
 #include <qlabel.h>
 #include <qpushbutton.h>
+#include <qlistview.h>
+#include <qcombobox.h>
+#include <qlistbox.h>
+#include <qfiledialog.h>
+#include <qbuttongroup.h>
 #include <qheader.h>
+#define Q3ListView QListView
+#endif
 
-#include "config.h"
 #include "oprof_start.h"
 #include "op_config.h"
 #include "op_config_24.h"
@@ -268,10 +284,10 @@ void oprof_start::fill_events()
 namespace {
 
 /// find the first item with the given text in column 0 or return NULL
-QListViewItem * findItem(QListView * view, char const * name)
+Q3ListViewItem * findItem(Q3ListView * view, char const * name)
 {
 	// Qt 2.3.1 does not have QListView::findItem()
-	QListViewItem * item = view->firstChild();
+	Q3ListViewItem * item = view->firstChild();
 
 	while (item && strcmp(item->text(0).latin1(), name))
 		item = item->nextSibling();
@@ -292,7 +308,7 @@ void oprof_start::setup_default_event()
 	event_cfgs[descr.name].user_ring_count = 1;
 	event_cfgs[descr.name].os_ring_count = 1;
 
-	QListViewItem * item = findItem(events_list, descr.name);
+	Q3ListViewItem * item = findItem(events_list, descr.name);
 	if (item)
 		item->setSelected(true);
 }
@@ -349,7 +365,7 @@ void oprof_start::read_set_events()
 			event_cfgs[ev_name].os_ring_count = 1;
 		}
 
-		QListViewItem * item = findItem(events_list, ev_name.c_str());
+		Q3ListViewItem * item = findItem(events_list, ev_name.c_str());
 		if (item)
 			item->setSelected(true);
 	}
@@ -436,7 +452,7 @@ void oprof_start::fill_events_listbox()
 
 	for (vector<op_event_descr>::reverse_iterator cit = v_events.rbegin();
 	     cit != v_events.rend(); ++cit) {
-		new QListViewItem(events_list, cit->name.c_str());
+		new Q3ListViewItem(events_list, cit->name.c_str());
 	}
 
 	setUpdatesEnabled(true);
@@ -467,7 +483,7 @@ void oprof_start::display_event(op_event_descr const & descr)
 }
 
 
-bool oprof_start::is_selectable_event(QListViewItem * item)
+bool oprof_start::is_selectable_event(Q3ListViewItem * item)
 {
 	if (item->isSelected())
 		return true;
@@ -486,7 +502,7 @@ bool oprof_start::is_selectable_event(QListViewItem * item)
 
 void oprof_start::draw_event_list()
 {
-	QListViewItem * cur;
+	Q3ListViewItem * cur;
 	for (cur = events_list->firstChild(); cur; cur = cur->nextSibling()) {
 		if (is_selectable_event(cur))
 			cur->setPixmap(0, *green_pixmap);
@@ -500,7 +516,7 @@ bool oprof_start::alloc_selected_events() const
 {
 	vector<op_event const *> events;
 
-	set<QListViewItem *>::const_iterator it;
+	set<Q3ListViewItem *>::const_iterator it;
 	for (it = selected_events.begin(); it != selected_events.end(); ++it)
 		events.push_back(find_event_by_name((*it)->text(0).latin1(),0,0));
 
@@ -520,24 +536,24 @@ void oprof_start::event_selected()
 	// (de)selected item so we record a set of selected items and diff
 	// it in the appropriate way with the previous list of selected items.
 
-	set<QListViewItem *> current_selection;
-	QListViewItem * cur;
+	set<Q3ListViewItem *> current_selection;
+	Q3ListViewItem * cur;
 	for (cur = events_list->firstChild(); cur; cur = cur->nextSibling()) {
 		if (cur->isSelected())
 			current_selection.insert(cur);
 	}
 
 	// First remove the deselected item.
-	vector<QListViewItem *> new_deselected;
+	vector<Q3ListViewItem *> new_deselected;
 	set_difference(selected_events.begin(), selected_events.end(),
 		       current_selection.begin(), current_selection.end(),
 		       back_inserter(new_deselected));
-	vector<QListViewItem *>::const_iterator it;
+	vector<Q3ListViewItem *>::const_iterator it;
 	for (it = new_deselected.begin(); it != new_deselected.end(); ++it)
 		selected_events.erase(*it);
 
 	// Now try to add the newly selected item if enough HW resource exists
-	vector<QListViewItem *> new_selected;
+	vector<Q3ListViewItem *> new_selected;
 	set_difference(current_selection.begin(), current_selection.end(),
 		       selected_events.begin(), selected_events.end(),
 		       back_inserter(new_selected));
@@ -558,7 +574,7 @@ void oprof_start::event_selected()
 }
 
 
-void oprof_start::event_over(QListViewItem * item)
+void oprof_start::event_over(Q3ListViewItem * item)
 {
 	op_event_descr const & descr = locate_event(item->text(0).latin1());
 
@@ -566,10 +582,10 @@ void oprof_start::event_over(QListViewItem * item)
 	if (!is_selectable_event(item)) {
 		help_str += " conflicts with:";
 
-		set<QListViewItem *>::const_iterator it;
+		set<Q3ListViewItem *>::const_iterator it;
 		for (it = selected_events.begin(); 
 		     it != selected_events.end(); ) {
-			QListViewItem * temp = *it;
+			Q3ListViewItem * temp = *it;
 			selected_events.erase(it++);
 			if (is_selectable_event(item)) {
 				help_str += " ";
@@ -844,7 +860,7 @@ void oprof_start::on_start_profiler()
 
 	bool one_enable = false;
 
-	QListViewItem * cur;
+	Q3ListViewItem * cur;
 	for (cur = events_list->firstChild(); cur; cur = cur->nextSibling()) {
 		if (!cur->isSelected())
 			continue;
@@ -946,7 +962,7 @@ bool oprof_start::save_config()
 	vector<string> tmpargs;
 	tmpargs.push_back("--setup");
 
-	QListViewItem * cur;
+	Q3ListViewItem * cur;
 	for (cur = events_list->firstChild(); cur; cur = cur->nextSibling()) {
 		if (!cur->isSelected())
 			continue;

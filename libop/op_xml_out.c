@@ -83,7 +83,8 @@ char const * xml_tag_map[] = {
 		"category",
 	"unit_mask",
 		"mask",
-		"desc"
+		"desc",
+		"extra"
 };
 
 #define MAX_BUF_LEN 2048

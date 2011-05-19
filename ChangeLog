@@ -1,3 +1,17 @@
+2011-02-25  Maynard Johnson  <maynardj@us.ibm.com>
+
+	From this date forward, ChangeLog entries will not
+	be necessary, since 'git log' can now be used to show
+	changes in the repository.
+
+2011-02-09  William Cohen  <wcohen@redhat.com>
+
+	* libpp/format_output.h: Do not use mutable for reference variable.
+
+2011-01-17  Will Deacon  <will.deacon@arm.com>
+
+	* events/arm/armv7-ca9/events: Add missing TLB event
+
 2011-01-05  William Cohen  <wcohen@redhat.com>
 
 	* utils/opcontrol: Add argument checking for numerical arguments

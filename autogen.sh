@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# run to generate needed files not in CVS
+# run to generate needed files not in Git repository
 
 # NB: if you run this file with AUTOMAKE, AUTOCONF, etc. environment
 # variables set, you *must* run "configure" with the same variables

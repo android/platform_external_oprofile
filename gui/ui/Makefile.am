@@ -2,7 +2,7 @@ EXTRA_DIST = oprof_start.base.ui
 
 if have_qt
 
-AM_CPPFLAGS = @QT_INCLUDES@
+AM_CPPFLAGS = @QT_CFLAGS@
 
 AM_CXXFLAGS = @OP_CXXFLAGS@
 

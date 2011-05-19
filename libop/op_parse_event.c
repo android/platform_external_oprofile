@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "op_parse_event.h"
 #include "op_string.h"
@@ -94,8 +95,12 @@ size_t parse_events(struct parsed_event * parsed_events, size_t max_events,
 
 		if (part) {
 			parsed_events[i].unit_mask_valid = 1;
-			parsed_events[i].unit_mask = parse_ulong(part);
-			free(part);
+			if (!isdigit(*part))
+				parsed_events[i].unit_mask_name = part;
+			else {
+				parsed_events[i].unit_mask = parse_ulong(part);
+				free(part);
+			}
 		}
 
 		parsed_events[i].kernel = 1;

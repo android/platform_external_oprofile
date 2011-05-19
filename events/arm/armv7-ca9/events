@@ -11,6 +11,7 @@ event:0x51 counters:1,2,3,4,5,6 um:zero minimum:500 name:CO_LF_HIT : Number of c
 
 event:0x60 counters:1,2,3,4,5,6 um:zero minimum:500 name:IC_DEP_STALL : Number of cycles where CPU is ready to accept new instructions but does not receive any because of the instruction side not being able to provide any and the instruction cache is currently performing at least one linefill
 event:0x61 counters:1,2,3,4,5,6 um:zero minimum:500 name:DC_DEP_STALL : Number of cycles where CPU has some instructions that it cannot issue to any pipeline and the LSU has at least one pending linefill request but no pending TLB requests
+event:0x62 counters:1,2,3,4,5,6 um:zero minimum:500 name:STALL_MAIN_TLB : Number of cycles where CPU is stalled waiting for completion of translation table walk from the main TLB
 event:0x63 counters:1,2,3,4,5,6 um:zero minimum:500 name:STREX_PASS : Number of STREX instructions architecturally executed and passed
 event:0x64 counters:1,2,3,4,5,6 um:zero minimum:500 name:STREX_FAILS : Number of STREX instructions architecturally executed and failed
 event:0x65 counters:1,2,3,4,5,6 um:zero minimum:500 name:DATA_EVICT : Number of eviction requests due to a linefill in the data cache

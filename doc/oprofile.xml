@@ -196,8 +196,8 @@ For information on how to use OProfile's JIT support, see <xref linkend="setup-j
 	<varlistentry>
 		<term>OProfile GUI</term>
 		<listitem><para>
-			The use of the GUI to start the profiler requires the <filename>Qt 2</filename> library. <filename>Qt 3</filename> should
-			also work.
+			The use of the GUI to start the profiler requires the <filename>Qt</filename> library.
+			Either <filename>Qt 3</filename> or <filename>Qt 4</filename> should work.
 		</para></listitem>
 	</varlistentry>
 	<varlistentry>
@@ -231,7 +231,8 @@ For information on how to use OProfile's JIT support, see <xref linkend="setup-j
 	<varlistentry>
 		<term>Download</term>
 		<listitem><para>
-			You can download a source tarball or get anonymous CVS at the sourceforge page,
+			You can download a source tarball or check out code from
+			the code repository at the sourceforge page,
 			<ulink url="http://sf.net/projects/oprofile/">http://sf.net/projects/oprofile/</ulink>.
 		</para></listitem>
 	</varlistentry>
@@ -876,7 +877,8 @@ of the form <option><emphasis>name</emphasis>:<emphasis>count</emphasis>:<emphas
 <tbody>
 <row><entry><option>name</option></entry><entry>The symbolic event name, e.g. <constant>CPU_CLK_UNHALTED</constant></entry></row>
 <row><entry><option>count</option></entry><entry>The counter reset value, e.g. 100000</entry></row>
-<row><entry><option>unitmask</option></entry><entry>The unit mask, as given in the events list, e.g. 0x0f</entry></row>
+<row><entry><option>unitmask</option></entry><entry>The unit mask, as given in the events list: e.g. 0x0f; or a symbolic name as
+given by the first word of the description (only valid for unit masks having an "extra:" parameter)</entry></row>
 <row><entry><option>kernel</option></entry><entry>Whether to profile kernel code</entry></row>
 <row><entry><option>user</option></entry><entry>Whether to profile userspace code</entry></row>
 </tbody>

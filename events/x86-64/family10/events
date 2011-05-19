@@ -7,14 +7,21 @@
 #		Suravee Suthikulpanit <suravee.suthikulpanit at amd.com>
 #
 # Sources: BIOS and Kernel Developer's Guide for AMD Family 10h Processors,
-#          Publication# 31116, Revision 3.28, May 28, 2009
+#          Publication# 31116, Revision 3.48, April 22, 2010
 #
-#          Software Optimization Guide for AMD Family 10h Processors,
-#          Publication# 40546, Revision 3.04, September 2007
+#          Software Optimization Guide for AMD Family 10h and Family 12h Processors,
+#          Publication# 40546, Revision 3.13, February 2011
+#          (Note: For IBS Derived Performance Events)
 #
-# Revision: 1.3
+# Revision: 1.4
 #
 # ChangeLog: 
+#	1.4: 11 March 2011
+#       - Update to BKDG revision 3.48
+#       - Fix typo in the description for event 0xf244
+#       - Update the minimum for RETIRED_UOPS
+#       - Add event 0x68, 0x69
+#
 #	1.3: 22 October 2009.
 # 	- Update from BKDG Rev 3.28 to Rev 3.34 (no change)
 #	- Specify that event 4EDh is for Rev D only
@@ -71,6 +78,8 @@ event:0x54 counters:0,1,2,3 um:zero minimum:500 name:GLOBAL_TLB_FLUSHES : The nu
 # L2 Cache and System Interface events
 event:0x65 counters:0,1,2,3 um:memreqtype minimum:500 name:MEMORY_REQUESTS : Memory requests by type
 event:0x67 counters:0,1,2,3 um:dataprefetch minimum:500 name:DATA_PREFETCHES : Data prefetcher
+event:0x068 counters:0,1,2,3 um:mab_buffer minimum:500 name:MAB_REQS : MAB Requests
+event:0x069 counters:0,1,2,3 um:mab_buffer minimum:500 name:MAB_WAIT : MAB Wait Cycles
 event:0x6c counters:0,1,2,3 um:systemreadresponse minimum:500 name:NORTHBRIDGE_READ_RESPONSES : Northbridge read responses by coherency state
 event:0x6d counters:0,1,2,3 um:octword_transfer minimum:500 name:OCTWORD_WRITE_TRANSFERS : Octwords written to system
 event:0x76 counters:0,1,2,3 um:zero minimum:50000 name:CPU_CLK_UNHALTED : Cycles outside of halt state
@@ -97,7 +106,7 @@ event:0x9a counters:0,1,2,3 um:zero minimum:500 name:ITLB_RELOADS_ABORTED : The 
 
 # Execution Unit events
 event:0xc0 counters:0,1,2,3 um:zero minimum:50000 name:RETIRED_INSTRUCTIONS : Retired instructions (includes exceptions, interrupts, re-syncs)
-event:0xc1 counters:0,1,2,3 um:zero minimum:500 name:RETIRED_UOPS : Retired micro-ops
+event:0xc1 counters:0,1,2,3 um:zero minimum:50000 name:RETIRED_UOPS : Retired micro-ops
 event:0xc2 counters:0,1,2,3 um:zero minimum:500 name:RETIRED_BRANCH_INSTRUCTIONS : Retired branches (conditional, unconditional, exceptions, interrupts)
 event:0xc3 counters:0,1,2,3 um:zero minimum:500 name:RETIRED_MISPREDICTED_BRANCH_INSTRUCTIONS : Retired mispredicted branch instructions
 event:0xc4 counters:0,1,2,3 um:zero minimum:500 name:RETIRED_TAKEN_BRANCH_INSTRUCTIONS : Retired taken branch instructions
@@ -129,7 +138,7 @@ event:0xdd counters:0,1,2,3 um:zero minimum:500 name:DR1_BREAKPOINTS : The numbe
 event:0xde counters:0,1,2,3 um:zero minimum:500 name:DR2_BREAKPOINTS : The number of matches on the address in breakpoint register DR2
 event:0xdf counters:0,1,2,3 um:zero minimum:500 name:DR3_BREAKPOINTS : The number of matches on the address in breakpoint register DR3
 event:0x1c0 counters:0,1,2,3 um:retired_x87_fp minimum:500 name:RETIRED_X87_FLOATING_POINT_OPERATIONS : Retired x87 Floating Point Operations (RevC and later)
-event:0x1cf counters:0,1,2,3 um:zero minimum:50000 name:IBS_OPS_TAGGED : IBS Ops Tagged (RevC and later)
+event:0x1cf counters:0,1,2,3 um:zero minimum:500000 name:IBS_OPS_TAGGED : IBS Ops Tagged (RevC and later)
 event:0x1d3 counters:0,1,2,3 um:zero minimum:500 name:LFENCE_INSTRUCTIONS_RETIRED : LFENCE Instructions Retired (RevC and later)
 event:0x1d4 counters:0,1,2,3 um:zero minimum:500 name:SFENCE_INSTRUCTIONS_RETIRED : SFENCE Instructions Retired (RevC and later)
 event:0x1d5 counters:0,1,2,3 um:zero minimum:500 name:MFENCE_INSTRUCTIONS_RETIRED : MFENCE Instructions Retired (RevC and later)
@@ -230,7 +239,7 @@ event:0xf240 ext:ibs_op um:ibs_op minimum:50000 name:IBS_OP_NB_LOCAL_ONLY : IBS 
 event:0xf241 ext:ibs_op um:ibs_op minimum:50000 name:IBS_OP_NB_REMOTE_ONLY : IBS northbridge remote
 event:0xf242 ext:ibs_op um:ibs_op minimum:50000 name:IBS_OP_NB_LOCAL_L3 : IBS northbridge local L3
 event:0xf243 ext:ibs_op um:ibs_op minimum:50000 name:IBS_OP_NB_LOCAL_CACHE : IBS northbridge local core L1 or L2 cache
-event:0xf244 ext:ibs_op um:ibs_op minimum:50000 name:IBS_OP_NB_REMOTE_CACHE : IBS northbridge local core L1, L2, L3 cache
+event:0xf244 ext:ibs_op um:ibs_op minimum:50000 name:IBS_OP_NB_REMOTE_CACHE : IBS northbridge remote core L1, L2, L3 cache
 event:0xf245 ext:ibs_op um:ibs_op minimum:50000 name:IBS_OP_NB_LOCAL_DRAM : IBS northbridge local DRAM
 event:0xf246 ext:ibs_op um:ibs_op minimum:50000 name:IBS_OP_NB_REMOTE_DRAM : IBS northbridge remote DRAM
 event:0xf247 ext:ibs_op um:ibs_op minimum:50000 name:IBS_OP_NB_LOCAL_OTHER : IBS northbridge local APIC MMIO Config PCI

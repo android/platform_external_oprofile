@@ -14,7 +14,7 @@ EXTRA_DIST = $(dist_sources)
 if have_qt
 
 AM_CPPFLAGS = \
-	@QT_INCLUDES@ \
+	@QT_CFLAGS@ \
 	-I ${top_srcdir}/libop \
 	-I ${top_srcdir}/libutil++ \
 	-I ${top_srcdir}/libutil
@@ -30,8 +30,7 @@ oprof_start_LDADD = \
 	../libop/libop.a \
 	../libutil/libutil.a \
 	ui/liboprof_start.a \
-	@QT_LDFLAGS@ \
-	@QT_LIB@ \
+	@QT_LIBS@ \
 	@X_LIBS@
 
 oprof_start.moc.cpp: ${top_srcdir}/gui/oprof_start.h

@@ -103,6 +103,10 @@ void xml_help_for_event(struct op_event const * event)
 			init_xml_str_attr(HELP_UNIT_MASK_DESC,
 					  event->unit->um[i].desc,
 					  buffer, MAX_BUFFER);
+			if (event->unit->um[i].extra)
+				init_xml_int_attr(HELP_UNIT_EXTRA_VALUE,
+					          event->unit->um[i].extra,
+					          buffer, MAX_BUFFER);
 			close_xml_element(NONE, 0, buffer, MAX_BUFFER);
 		}
 		close_xml_element(HELP_UNIT_MASKS, 0, buffer, MAX_BUFFER);

@@ -1,4 +1,3 @@
-#
 # AMD Family 10 processor unit masks
 #
 # Copyright OProfile authors
@@ -8,14 +7,21 @@
 #		Suravee Suthikulpanit <suravee.suthikulpanit at amd.com>
 #
 # Sources: BIOS and Kernel Developer's Guide for AMD Family 10h Processors,
-#          Publication# 31116, Revision 3.34, September 2009
+#          Publication# 31116, Revision 3.48, April 22, 2010
 #
-#          Software Optimization Guide for AMD Family 10h Processors,
-#          Publication# 40546, Revision 3.04, September 2007
+#          Software Optimization Guide for AMD Family 10h and Family 12h Processors,
+#          Publication# 40546, Revision 3.13, February 2011
+#          (Note: For IBS Derived Performance Events)
 #
-# Revision: 1.3
+# Revision: 1.4
 #
 # ChangeLog: 
+#	1.4: 11 March 2011
+#       - Update to BKDG revision 3.48
+#       - Fix typo in the description for event 0xf244
+#       - Update the minimum for RETIRED_UOPS
+#       - Add event 0x68, 0x69
+#
 #	1.3: 22 October 2009.
 # 	- Update from BKDG Rev 3.28 to Rev 3.34 (no change)
 #	- Modify unitmasks l3_evict
@@ -184,6 +190,17 @@ name:memreqtype type:bitmask default:0x83
 	0x01 Requests to non-cacheable (UC) memory
 	0x02 Requests to write-combining (WC) memory or WC buffer flushes to WB memory
 	0x80 Streaming store (SS) requests
+name:mab_buffer type:exclusive default:0x00
+	0x00 DC miss buffer 0
+	0x01 DC miss buffer 1
+	0x02 DC miss buffer 2
+	0x03 DC miss buffer 3
+	0x04 DC miss buffer 4
+	0x05 DC miss buffer 5
+	0x06 DC miss buffer 6
+	0x07 DC miss buffer 7
+	0x08 IC miss buffer 0
+	0x09 IC miss buffer 1
 name:systemreadresponse type:bitmask default:0x1f
 	0x01 Exclusive
 	0x02 Modified

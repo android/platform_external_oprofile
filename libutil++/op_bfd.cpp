@@ -396,6 +396,9 @@ size_t op_bfd::symbol_size(op_bfd_symbol const & sym,
 	else
 		end = next ? next->filepos() : file_size;
 
+	if (start > end)
+		return 0;
+
 	return end - start;
 }
 

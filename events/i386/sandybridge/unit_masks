@@ -1,0 +1,275 @@
+#
+# Unit masks for the Intel "sandy-bridge" micro architecture
+#
+# See http://ark.intel.com/ for help in identifying sandy-bridge based CPUs
+#
+include:i386/arch_perfmon
+name:x02 type:mandatory default:0x2
+	0x2 No unit mask
+name:x10 type:mandatory default:0x10
+	0x10 No unit mask
+name:x20 type:mandatory default:0x20
+	0x20 No unit mask
+name:ld_blocks type:bitmask default:0x1
+	0x1 data_unknown blocked loads due to store buffer blocks with unknown data.
+	0x2 store_forward loads blocked by overlapping with store buffer that cannot be forwarded
+	0x8 no_sr This event counts the number of times that split load operations are temporarily blocked because all resources for handling the split accesses are in use.
+	0x10 all_block Number of cases where any load is blocked but has no DCU miss.
+name:misalign_mem_ref type:bitmask default:0x1
+	0x1 loads Speculative cache-line split load uops dispatched to the L1D.
+	0x2 stores Speculative cache-line split Store-address uops dispatched to L1D
+name:ld_blocks_partial type:bitmask default:0x1
+	0x1 address_alias False dependencies in MOB due to partial compare on address
+	0x8 all_sta_block This event counts the number of times that load operations are temporarily blocked because of older stores, with addresses that are not yet known. A load operation may incur more than one block of this type.
+name:dtlb_load_misses type:bitmask default:0x1
+	0x1 miss_causes_a_walk Miss in all TLB levels causes an page walk of any page size (4K/2M/4M/1G)
+	0x2 walk_completed Miss in all TLB levels causes a page walk that completes of any page size (4K/2M/4M/1G)
+	0x4 walk_duration Cycles PMH is busy with this walk
+	0x10 stlb_hit First level miss but second level hit; no page walk.
+name:int_misc type:bitmask default:0x40
+	0x40 rat_stall_cycles Cycles Resource Allocation Table (RAT) external stall is sent to Instruction Decode Queue (IDQ) for this thread.
+	0x3 extra:cmask=1 recovery_cycles Number of cycles waiting to be recover after Nuke due to all other cases except JEClear.
+	0x3 extra:cmask=1,edge recovery_stalls_count Edge applied to recovery_cycles, thus counts occurrences.
+name:uops_issued type:bitmask default:0x1
+	0x1 any Number of Uops issued by the Resource Allocation Table (RAT) to the Reservation Station (RS)
+	0x1 extra:cmask=1,inv stall_cycles cycles no uops issued by this thread.
+name:arith type:bitmask default:0x1
+	0x1 fpu_div_active Cycles that the divider is busy with any divide or sqrt operation.
+	0x1 extra:cmask=1,edge fpu_div Number of times that the divider is actived, includes INT, SIMD and FP.
+name:l2_rqsts type:bitmask default:0x1
+	0x1 demand_data_rd_hit Demand Data Read hit L2, no rejects
+	0x4 rfo_hit RFO requests that hit L2 cache
+	0x8 rfo_miss RFO requests that miss L2 cache
+	0x10 code_rd_hit L2 cache hits when fetching instructions, code reads.
+	0x20 code_rd_miss L2 cache misses when fetching instructions
+	0x40 pf_hit Requests from the L2 hardware prefetchers that hit L2 cache
+	0x80 pf_miss Requests from the L2 hardware prefetchers that miss L2 cache
+	0x3 all_demand_data_rd Any data read request to L2 cache
+	0xc all_rfo Any data RFO request to L2 cache
+	0x30 all_code_rd Any code read request to L2 cache
+	0xc0 all_pf Any L2 HW prefetch request to L2 cache
+name:l2_store_lock_rqsts type:bitmask default:0xf
+	0xf all RFOs that access cache lines in any state
+	0x1 miss RFO (as a result of regular RFO or Lock request) miss cache - I state
+	0x4 hit_e RFO (as a result of regular RFO or Lock request) hits cache in E state
+	0x8 hit_m RFO (as a result of regular RFO or Lock request) hits cache in M state
+name:l2_l1d_wb_rqsts type:bitmask default:0x4
+	0x4 hit_e writebacks from L1D to L2 cache lines in E state
+	0x8 hit_m writebacks from L1D to L2 cache lines in M state
+name:l1d_pend_miss type:bitmask default:0x1
+	0x1 pending Cycles with L1D load Misses outstanding.
+	0x1 extra:cmask=1,edge occurences This event counts the number of L1D misses outstanding occurences.
+name:dtlb_store_misses type:bitmask default:0x1
+	0x1 miss_causes_a_walk Miss in all TLB levels causes an page walk of any page size (4K/2M/4M/1G)
+	0x2 walk_completed Miss in all TLB levels causes a page walk that completes of any page size (4K/2M/4M/1G)
+	0x4 walk_duration Cycles PMH is busy with this walk
+	0x10 stlb_hit First level miss but second level hit; no page walk.  Only relevant if multiple levels.
+name:load_hit_pre type:bitmask default:0x1
+	0x1 sw_pf Load  dispatches that hit fill buffer allocated for S/W prefetch.
+	0x2 hw_pf Load  dispatches that hit fill buffer allocated for HW prefetch.
+name:l1d type:bitmask default:0x1
+	0x1 replacement L1D Data line replacements.
+	0x2 allocated_in_m L1D M-state Data Cache Lines Allocated
+	0x4 eviction L1D M-state Data Cache Lines Evicted due to replacement (only)
+	0x8 all_m_replacement All Modified lines evicted out of L1D
+name:partial_rat_stalls type:bitmask default:0x20
+	0x20 flags_merge_uop Number of perf sensitive flags-merge uops added by Sandy Bridge u-arch.
+	0x40 slow_lea_window Number of cycles with at least 1 slow Load Effective Address (LEA) uop being allocated.
+	0x80 mul_single_uop Number of Multiply packed/scalar single precision uops allocated
+	0x20 extra:cmask=1 flags_merge_uop_cycles Cycles with perf sensitive flags-merge uops added by SandyBridge u-arch.
+name:resource_stalls2 type:bitmask default:0x40
+	0x40 bob_full Cycles Allocator is stalled due Branch Order Buffer (BOB).
+	0xf all_prf_control Resource stalls2 control structures full for physical registers
+	0xc all_fl_empty Cycles with either free list is empty
+	0x4f ooo_rsrc Resource stalls2 control structures full Physical Register Reclaim Table (PRRT),  Physical History Table (PHT), INT or SIMD Free List (FL), Branch Order Buffer (BOB)
+name:cpl_cycles type:bitmask default:0x1
+	0x1 ring0 Unhalted core cycles the Thread was in Rings 0.
+	0x1 extra:cmask=1,edge ring0_trans Transitions from ring123 to Ring0.
+	0x2 ring123 Unhalted core cycles the Thread was in Rings 1/2/3.
+name:offcore_requests_outstanding type:bitmask default:0x1
+	0x1 demand_data_rd Offcore outstanding Demand Data Read transactions in the SuperQueue (SQ), queue to uncore, every cycle. Includes L1D data hardware prefetches.
+	0x1 extra:cmask=1 cycles_with_demand_data_rd cycles there are Offcore outstanding RD data transactions in the SuperQueue (SQ), queue to uncore.
+	0x2 demand_code_rd Offcore outstanding Code Reads transactions in the SuperQueue (SQ), queue to uncore, every cycle.
+	0x4 demand_rfo Offcore outstanding RFO (store) transactions in the SuperQueue (SQ), queue to uncore, every cycle.
+	0x8 all_data_rd Offcore outstanding all cacheable Core Data Read transactions in the SuperQueue (SQ), queue to uncore, every cycle.
+	0x8 extra:cmask=1 cycles_with_data_rd Cycles there are Offcore outstanding all Data read transactions in the SuperQueue (SQ), queue to uncore, every cycle.
+	0x2 extra:cmask=1 cycles_with_demand_code_rd Cycles with offcore outstanding Code Reads transactions in the SuperQueue (SQ), queue to uncore, every cycle.
+	0x4 extra:cmask=1 cycles_with_demand_rfo Cycles with offcore outstanding demand RFO Reads transactions in the SuperQueue (SQ), queue to uncore, every cycle.
+name:lock_cycles type:bitmask default:0x1
+	0x1 split_lock_uc_lock_duration Cycles in which the L1D and L2  are locked, due to a UC lock or split lock
+	0x2 cache_lock_duration cycles that theL1D is locked
+name:idq type:bitmask default:0x2
+	0x2 empty Cycles the Instruction Decode Queue (IDQ) is empty.
+	0x4 mite_uops Number of uops delivered to Instruction Decode Queue (IDQ) from MITE path.
+	0x8 dsb_uops Number of uops delivered to Instruction Decode Queue (IDQ) from Decode Stream Buffer (DSB) path.
+	0x10 ms_dsb_uops Number of Uops delivered into Instruction Decode Queue (IDQ) when MS_Busy, initiated by Decode Stream Buffer (DSB).
+	0x20 ms_mite_uops Number of Uops delivered into Instruction Decode Queue (IDQ) when MS_Busy, initiated by MITE.
+	0x30 ms_uops Number of Uops were delivered into Instruction Decode Queue (IDQ) from MS, initiated by Decode Stream Buffer (DSB) or MITE.
+	0x30 extra:cmask=1 ms_cycles Number of cycles that Uops were delivered into Instruction Decode Queue (IDQ) when MS_Busy, initiated by Decode Stream Buffer (DSB) or MITE.
+	0x4 extra:cmask=1 mite_cycles Cycles MITE is active
+	0x8 extra:cmask=1 dsb_cycles Cycles Decode Stream Buffer (DSB) is active
+	0x10 extra:cmask=1 ms_dsb_cycles Cycles Decode Stream Buffer (DSB) Microcode Sequenser (MS) is active
+	0x10 extra:cmask=1,edge ms_dsb_occur Occurences of  Decode Stream Buffer (DSB) Microcode Sequenser (MS) going active
+	0x18 extra:cmask=1 all_dsb_cycles_any_uops Cycles Decode Stream Buffer (DSB) is delivering anything
+	0x18 extra:cmask=4 all_dsb_cycles_4_uops Cycles Decode Stream Buffer (DSB) is delivering 4 Uops
+	0x24 extra:cmask=1 all_mite_cycles_any_uops Cycles MITE is delivering anything
+	0x24 extra:cmask=4 all_mite_cycles_4_uops Cycles MITE is delivering 4 Uops
+	0x3c mite_all_uops Number of uops delivered to Instruction Decode Queue (IDQ) from any path.
+name:itlb_misses type:bitmask default:0x1
+	0x1 miss_causes_a_walk Miss in all TLB levels causes an page walk of any page size (4K/2M/4M)
+	0x2 walk_completed Miss in all TLB levels causes a page walk that completes of any page size (4K/2M/4M)
+	0x4 walk_duration Cycles PMH is busy with this walk.
+	0x10 stlb_hit First level miss but second level hit; no page walk.
+name:ild_stall type:bitmask default:0x1
+	0x1 lcp Stall "occurrences" due to length changing prefixes (LCP).
+	0x4 iq_full Stall cycles when instructions cannot be written because the Instruction Queue (IQ) is full.
+name:br_inst_exec type:bitmask default:0xff
+	0xff all_branches All branch instructions executed.
+	0x41 nontaken_conditional All macro conditional nontaken branch instructions.
+	0x81 taken_conditional All macro conditional taken branch instructions.
+	0x82 taken_direct_jump All macro unconditional taken branch instructions, excluding calls and indirects.
+	0x84 taken_indirect_jump_non_call_ret All taken indirect branches that are not calls nor returns.
+	0x88 taken_indirect_near_return All taken indirect branches that have a return mnemonic.
+	0x90 taken_direct_near_call All taken non-indirect calls.
+	0xa0 taken_indirect_near_call All taken indirect calls, including both register and memory indirect.
+	0xc1 all_conditional All macro conditional branch instructions.
+	0xc2 all_direct_jmp All macro unconditional branch instructions, excluding calls and indirects
+	0xc4 all_indirect_jump_non_call_ret All indirect branches that are not calls nor returns.
+	0xc8 all_indirect_near_return All indirect return branches.
+	0xd0 all_direct_near_call All non-indirect calls executed.
+name:br_misp_exec type:bitmask default:0xff
+	0xff all_branches All mispredicted branch instructions executed.
+	0x41 nontaken_conditional All nontaken mispredicted macro conditional branch instructions.
+	0x81 taken_conditional All taken mispredicted macro conditional branch instructions.
+	0x84 taken_indirect_jump_non_call_ret All taken mispredicted indirect branches that are not calls nor returns.
+	0x88 taken_return_near All taken mispredicted indirect branches that have a return mnemonic.
+	0x90 taken_direct_near_call All taken mispredicted non-indirect calls.
+	0xa0 taken_indirect_near_call All taken mispredicted indirect calls, including both register and memory indirect.
+	0xc1 all_conditional All mispredicted macro conditional branch instructions.
+	0xc4 all_indirect_jump_non_call_ret All mispredicted indirect branches that are not calls nor returns.
+	0xd0 all_direct_near_call All mispredicted non-indirect calls
+name:idq_uops_not_delivered type:bitmask default:0x1
+	0x1 core Count number of non-delivered uops to Resource Allocation Table (RAT).
+	0x1 extra:cmask=4 cycles_0_uops_deliv.core Counts the cycles no uops were delivered
+	0x1 extra:cmask=3 cycles_le_1_uop_deliv.core Counts the cycles less than 1 uops were delivered
+	0x1 extra:cmask=2 cycles_le_2_uop_deliv.core Counts the cycles less than 2 uops were delivered
+	0x1 extra:cmask=1 cycles_le_3_uop_deliv.core Counts the cycles less than 3 uops were delivered
+	0x1 extra:cmask=4,inv cycles_ge_1_uop_deliv.core Cycles when 1 or more uops were delivered to the by the front end.
+	0x1 extra:cmask=1,inv cycles_fe_was_ok Counts cycles FE delivered 4 uops or Resource Allocation Table (RAT) was stalling FE.
+name:uops_dispatched_port type:bitmask default:0x1
+	0x1 port_0 Cycles which a Uop is dispatched on port 0
+	0x2 port_1 Cycles which a Uop is dispatched on port 1
+	0x4 port_2_ld Cycles which a load Uop is dispatched on port 2
+	0x8 port_2_sta Cycles which a STA Uop is dispatched on port 2
+	0x10 port_3_ld Cycles which a load Uop is dispatched on port 3
+	0x20 port_3_sta Cycles which a STA Uop is dispatched on port 3
+	0x40 port_4 Cycles which a Uop is dispatched on port 4
+	0x80 port_5 Cycles which a Uop is dispatched on port 5
+	0xc port_2 Uops disptached to port 2, loads and stores (speculative and retired)
+	0x30 port_3 Uops disptached to port 3, loads and stores (speculative and retired)
+	0xc port_2_core Uops disptached to port 2, loads and stores per core (speculative and retired)
+	0x30 port_3_core Uops disptached to port 3, loads and stores per core (speculative and retired)
+name:resource_stalls type:bitmask default:0x1
+	0x1 any Cycles Allocation is stalled due to Resource Related reason.
+	0x2 lb Cycles Allocator is stalled due to Load Buffer full
+	0x4 rs Stall due to no eligible Reservation Station (RS) entry available.
+	0x8 sb Cycles Allocator is stalled due to Store Buffer full (not including draining from synch).
+	0x10 rob ROB full cycles.
+	0xe mem_rs Resource stalls due to LB, SB or Reservation Station (RS) being completely in use
+	0xf0 ooo_rsrc Resource stalls due to Rob being full, FCSW, MXCSR and OTHER
+	0xa lb_sb Resource stalls due to load or store buffers
+name:dsb2mite_switches type:bitmask default:0x1
+	0x1 count Number of Decode Stream Buffer (DSB) to MITE switches
+	0x2 penalty_cycles Decode Stream Buffer (DSB)-to-MITE switch true penalty cycles.
+name:dsb_fill type:bitmask default:0x2
+	0x2 other_cancel Count number of times a valid DSB fill has been actually cancelled for any reason.
+	0x8 exceed_dsb_lines Decode Stream Buffer (DSB) Fill encountered > 3 Decode Stream Buffer (DSB) lines.
+	0xa all_cancel Count number of times a valid Decode Stream Buffer (DSB) fill has been actually cancelled for any reason.
+name:offcore_requests type:bitmask default:0x1
+	0x1 demand_data_rd Demand Data Read requests sent to uncore
+	0x2 demand_code_rd Offcore Code read requests. Includes Cacheable and Un-cacheables.
+	0x4 demand_rfo Offcore Demand RFOs. Includes regular RFO, Locks, ItoM.
+	0x8 all_data_rd Offcore Demand and prefetch data reads returned to the core.
+name:uops_dispatched type:bitmask default:0x1
+	0x1 thread Counts total number of uops to be dispatched per-thread each cycle.
+	0x1 extra:cmask=1,inv stall_cycles Counts number of cycles no uops were dispatced to be executed on this thread.
+	0x2 core Counts total number of uops dispatched from any thread
+name:tlb_flush type:bitmask default:0x1
+	0x1 dtlb_thread Count number of DTLB flushes of thread-specific entries.
+	0x20 stlb_any Count number of any STLB flushes
+name:l1d_blocks type:bitmask default:0x1
+	0x1 ld_bank_conflict Any dispatched loads cancelled due to DCU bank conflict
+	0x5 extra:cmask=1 bank_conflict_cycles Cycles with l1d blocks due to bank conflicts
+name:other_assists type:bitmask default:0x2
+	0x2 itlb_miss_retired Instructions that experienced an ITLB miss.  Non Pebs
+	0x10 avx_to_sse Number of transitions from AVX-256 to legacy SSE when penalty applicable Non Pebs
+	0x20 sse_to_avx Number of transitions from legacy SSE to AVX-256 when penalty applicable Non Pebs
+name:uops_retired type:bitmask default:0x1
+	0x1 all All uops that actually retired.
+	0x2 retire_slots number of retirement slots used non PEBS
+	0x1 extra:cmask=1,inv stall_cycles Cycles no executable uops retired
+	0x1 extra:cmask=10,inv total_cycles Number of cycles using always true condition applied to  non PEBS uops retired event.
+name:machine_clears type:bitmask default:0x2
+	0x2 memory_ordering Number of Memory Ordering Machine Clears detected.
+	0x4 smc Number of Self-modifying code (SMC) Machine Clears detected.
+	0x20 maskmov Number of AVX masked mov Machine Clears detected.
+name:br_inst_retired type:bitmask default:0x1
+	0x1 conditional Counts all taken and not taken macro conditional branch instructions.
+	0x2 near_call Counts all macro direct and indirect near calls. non PEBS
+	0x8 near_return This event counts the number of near ret instructions retired.
+	0x10 not_taken Counts all not taken macro branch instructions retired.
+	0x20 near_taken Counts the number of near branch taken instructions retired.
+	0x40 far_branch Counts the number of far branch  instructions retired.
+	0x4 all_branches_ps Counts all taken and not taken macro branches including far branches.(Precise Event)
+	0x2 near_call_r3 Ring123 only near calls (non precise)
+	0x2 near_call_r3_ps Ring123 only near calls (precise event)
+name:br_misp_retired type:bitmask default:0x1
+	0x1 conditional All mispredicted macro conditional branch instructions.
+	0x2 near_call All macro direct and indirect near calls
+	0x10 not_taken number of branch instructions retired that were mispredicted and not-taken.
+	0x20 taken number of branch instructions retired that were mispredicted and taken.
+	0x4 all_branches_ps all macro branches (Precise Event)
+name:fp_assist type:bitmask default:0x1e
+	0x1e extra:cmask=1 any Counts any FP_ASSIST umask was incrementing.
+	0x2 x87_output output - Numeric Overflow, Numeric Underflow, Inexact Result
+	0x4 x87_input input - Invalid Operation, Denormal Operand, SNaN Operand
+	0x8 simd_output Any output SSE* FP Assist - Numeric Overflow, Numeric Underflow.
+	0x10 simd_input Any input SSE* FP Assist
+name:mem_uops_retired type:bitmask default:0x11
+	0x11 stlb_miss_loads STLB misses dues to retired loads
+	0x12 stlb_miss_stores STLB misses dues to retired stores
+	0x21 lock_loads Locked retired loads
+	0x41 split_loads Retired loads causing cacheline splits
+	0x42 split_stores Retired stores causing cacheline splits
+	0x81 all_loads Any retired loads
+	0x82 all_stores Any retired stores
+name:mem_load_uops_retired type:bitmask default:0x1
+	0x1 l1_hit Load hit in nearest-level (L1D) cache
+	0x2 l2_hit Load hit in mid-level (L2) cache
+	0x4 llc_hit Load hit in last-level (L3) cache with no snoop needed
+	0x40 hit_lfb A load missed L1D but hit the Fill Buffer
+name:mem_load_uops_llc_hit_retired type:bitmask default:0x1
+	0x1 xsnp_miss Load LLC Hit and a cross-core Snoop missed in on-pkg core cache
+	0x2 xsnp_hit Load LLC Hit and a cross-core Snoop hits in on-pkg core cache
+	0x4 xsnp_hitm Load had HitM Response from a core on same socket (shared LLC).
+	0x8 xsnp_none Load hit in last-level (L3) cache with no snoop needed.
+name:l2_trans type:bitmask default:0x80
+	0x80 all_requests Transactions accessing L2 pipe
+	0x1 demand_data_rd Demand Data Read requests that access L2 cache, includes L1D prefetches.
+	0x2 rfo RFO requests that access L2 cache
+	0x4 code_rd L2 cache accesses when fetching instructions including L1D code prefetches
+	0x8 all_pf L2 or LLC HW prefetches that access L2 cache
+	0x10 l1d_wb L1D writebacks that access L2 cache
+	0x20 l2_fill L2 fill requests that access L2 cache
+	0x40 l2_wb L2 writebacks that access L2 cache
+name:l2_lines_in type:bitmask default:0x7
+	0x7 all L2 cache lines filling L2
+	0x1 i L2 cache lines in I state filling L2
+	0x2 s L2 cache lines in S state filling L2
+	0x4 e L2 cache lines in E state filling L2
+name:l2_lines_out type:bitmask default:0x1
+	0x1 demand_clean Clean line evicted by a demand
+	0x2 demand_dirty Dirty line evicted by a demand
+	0x4 pf_clean Clean line evicted by an L2 Prefetch
+	0x8 pf_dirty Dirty line evicted by an L2 Prefetch
+	0xa dirty_all Any Dirty line evicted

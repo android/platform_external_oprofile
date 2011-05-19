@@ -22,10 +22,10 @@ struct events_test {
 
 static struct events_test const events[] = 
 {
-	{ { "FOO:3000:0:0:0", 0 },    { "FOO", 3000, 0, 0, 0, 0 } },
-	{ { "BAR:3000", 0 },          { "BAR", 3000, 0, 1, 1, 0 } },
-	{ { "FOOBAR:3000:1:1:1", 0 }, { "FOOBAR", 3000, 1, 1, 1, 0 } },
-	{ { NULL, NULL },             { 0, 0, 0, 0, 0, 0 } }
+	{ { "FOO:3000:0:0:0", 0 },    { "FOO", 3000, 0, NULL, 0, 0, 0 } },
+	{ { "BAR:3000", 0 },          { "BAR", 3000, 0, NULL, 1, 1, 0 } },
+	{ { "FOOBAR:3000:1:1:1", 0 }, { "FOOBAR", 3000, 1, NULL, 1, 1, 0 } },
+	{ { NULL, NULL },             { 0, 0, 0, NULL, 0, 0, 0 } }
 };
 
 static void do_test(struct events_test const * ev)

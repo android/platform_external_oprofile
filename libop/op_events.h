@@ -20,6 +20,11 @@ extern "C" {
 #include "op_types.h"
 #include "op_list.h"
 
+#define EXTRA_EDGE (1U << 18)
+#define EXTRA_INV  (1U << 23)
+#define EXTRA_CMASK_SHIFT 24
+#define EXTRA_CMASK_MASK 0xff
+
 /** Describe an unit mask type. Events can optionally use a filter called
  * the unit mask. the mask type can be a bitmask or a discrete value */
 enum unit_mask_type {
@@ -39,6 +44,7 @@ struct op_unit_mask {
 	enum unit_mask_type unit_type_mask;
 	u32 default_mask;	/**< only the gui use it */
 	struct op_described_um {
+	        u32 extra;
 		u32 value;
 		char * desc;
 	} um[MAX_UNIT_MASK];
@@ -121,6 +127,17 @@ struct op_default_event_descr {
  * Fills in the event description if applicable
  */
 void op_default_event(op_cpu cpu_type, struct op_default_event_descr * descr);
+
+/**
+ * op_resolve_unit_mask - resolve a unit mask in a parsed event.
+ * @pe parsed event
+ * @extra pointer to extra mask or NULL.
+ *
+ * Fills in the extra mask for the unit mask.
+ */
+
+struct parsed_event;
+void op_resolve_unit_mask(struct parsed_event *pe, u32 *extra);
 
 #ifdef __cplusplus
 }

@@ -12,12 +12,13 @@
 AC_PREREQ(2.13)
 
 AC_INIT(libop/op_config.h)
-AM_INIT_AUTOMAKE(oprofile, 0.9.7cvs)
+AM_INIT_AUTOMAKE(oprofile, 0.9.7git)
 AM_CONFIG_HEADER(config.h)
 
 AC_CHECK_DECLS([basename], [], [], [[#include <libgen.h>]])
 AC_PROG_RANLIB
 AC_PROG_LIBTOOL
+PKG_PROG_PKG_CONFIG
 
 dnl for the man page
 DATE="`date '+%a %d %B %Y'`"
@@ -77,7 +78,15 @@ AC_ARG_WITH(module-dir,
 AC_SUBST(MODINSTALLDIR)
 
 AC_ARG_WITH(java,
-[  --with-java=java-home        Path to Java home directory], JAVA_HOMEDIR=$withval)
+[  --with-java=java-home        Path to Java home directory (default is "no"; "yes" will use /usr as Java home)],
+JAVA_HOMEDIR=$with_java, [with_java=no])
+
+if test "x$with_java" = "xyes"; then
+	JAVA_HOMEDIR="/usr"
+else if test "x$with_java" = "xno"; then
+	JAVA_HOMEDIR=
+	fi
+fi
 AC_SUBST(JAVA_HOMEDIR)
 
 if test -n "$JAVA_HOMEDIR"; then
@@ -131,7 +140,63 @@ ORIG_X_SAVE_LIBS="$LIBS"
 LIBS="$X_PRE_LIBS $LIBS $X_LIBS -lX11 $X_EXTRA_LIBS"
 X_LIBS="$LIBS"
 AC_SUBST(X_LIBS)
-QT_DO_IT_ALL
+
+AC_ARG_ENABLE(gui,[  --enable-gui  compile with gui component (qt3|qt4|yes|no),
+		     if not given or set to yes, gui defaults to qt3],, enable_gui=qt3)
+
+if test "x$enable_gui"  = "xqt3"  || test "x$enable_gui"  = "xyes"; then
+	QT_VERSION=3
+	QT_DO_IT_ALL
+	if test -n "$QT_LIB"; then
+		QT_LIBS="$QT_LIB $QT_LDFLAGS"
+	fi
+	QT_CFLAGS="$QT_INCLUDES"
+fi
+
+if test "x$enable_gui"  = "xqt4"; then
+	QT_VERSION=4
+	PKG_CHECK_MODULES(QT, Qt3Support QtGui QtCore ,,[
+	echo "You requested QT4 but its build files are not available. Exiting now."
+	exit
+	])
+	MOC=$(pkg-config --variable=moc_location QtCore)
+	UIC=$(pkg-config --variable=uic_location QtCore)3
+	QT_VERSION=$(pkg-config --modversion QtCore)
+
+dnl following are some sanity tests and workarounds for buggy QtCore.pc files
+	if test "x$MOC" = "x"; then
+		echo "WARNING: Your QtCore.pc file is buggy, it doesn't provide the variable 'moc_location'"
+		echo "WARNING: I will try to find it in your PATH ..."
+		AC_CHECK_PROG(MOC, moc, moc)
+		if test "x$MOC" = "x"; then
+			echo "WARNING: You can fix this by adding the location of moc to your path."
+			echo "WARNING: Exiting now."
+			exit
+		fi
+	fi
+
+	if test "x$UIC" = "x3"; then
+		echo "WARNING: Your QtCore.pc file is buggy, it doesn't provide the variable 'uic_location'"
+		echo "WARNING: I will try to find it in your PATH ..."
+		AC_CHECK_PROG(UIChelp, uic3, uic3)
+		if test "x$UIChelp" = "x"; then
+			echo "WARNING: You can fix this by adding the location of uic3 to your path."
+			echo "WARNING: Exiting now."
+			exit
+		else
+			UIC="$UIChelp"
+		fi
+	fi
+
+	flags_has_qt3support=$(echo $QT_CFLAGS | grep QT3_SUPPORT)
+	if test "x$flags_has_qt3support" = "x" ; then
+		echo "WARNING: Your Qt3Support package is buggy; it dosn't include the 'QT3_SUPPORT' flag"
+		echo "WARNING: adding it manually"
+		QT_CFLAGS="$QT_CFLAGS -DQT3_SUPPORT"
+	fi
+fi
+AM_CONDITIONAL(have_qt, test -n "$QT_LIBS")
+
 LIBS="$ORIG_X_SAVE_LIBS"
 
 dnl enable pch for c++
@@ -155,7 +220,6 @@ AC_SUBST(POPT_LIBS)
 
 # do NOT put tests here, they will fail in the case X is not installed !
  
-AM_CONDITIONAL(have_qt, test -n "$QT_LIB")
 
 AX_CFLAGS_OPTION(OP_CFLAGS,[-W])
 AX_CXXFLAGS_OPTION(OP_CXXFLAGS,[-W])
@@ -182,7 +246,7 @@ AC_ARG_ENABLE(werror,
         enable_werror=$enableval, enable_werror=yes)
 if test "$enable_werror" = yes; then
 	# enable -Werror for non-release versions.
-	if echo "$VERSION" | grep cvs >/dev/null; then
+	if echo "$VERSION" | grep git >/dev/null; then
 		AX_CFLAGS_OPTION(OP_CFLAGS,[-Werror])
 		AX_CXXFLAGS_OPTION(OP_CXXFLAGS,[-Werror])
 	fi
@@ -274,8 +338,14 @@ AC_OUTPUT(Makefile \
 
 AX_COPY_IF_CHANGE(doc/xsl/catalog-1.xml, doc/xsl/catalog.xml)
 
-if test -z "$QT_LIB"; then
-	echo "Warning: a working Qt not found; no GUI will be built"
+if test "x$enable_gui" = "xno" ; then
+	echo "No GUI will be built as it was explicitly disabled."
+else
+	if test -z "$QT_LIBS"; then
+		echo "Warning: QT version $QT_VERSION was requested but not found. No GUI will be built."
+	else
+		echo "Building GUI with QT $QT_VERSION"
+	 fi
 fi
 
 if ! test "x$enable_account_check" = "xyes"; then

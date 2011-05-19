@@ -16,10 +16,16 @@
 #include <map>
 #include <set>
 
+#include "config.h"
+
 #include "ui/oprof_start.base.h"
 #include "oprof_start_config.h"
 
 #include "op_events.h"
+
+#ifndef QT3_SUPPORT
+#define Q3ListViewItem QListViewItem
+#endif
 
 class QIntValidator;
 class QListViewItem;
@@ -62,7 +68,7 @@ protected slots:
 	/// events selection change
 	void event_selected();
 	/// the mouse is over an event
-	void event_over(QListViewItem *);
+	void event_over(Q3ListViewItem *);
 	/// state of separate_kernel_cb changed
 	void on_separate_kernel_cb_changed(int);
 	/// reset sample files
@@ -121,7 +127,7 @@ private:
 	void draw_event_list();
 
 	/// return true if item is selectable or already selected
-	bool is_selectable_event(QListViewItem * item);
+	bool is_selectable_event(Q3ListViewItem * item);
 
 	/// try to alloc counters for the selected_events
 	bool alloc_selected_events() const;
@@ -139,8 +145,8 @@ private:
 	/// The currently selected events. We must track this because
 	/// with multiple selection listbox QT doesn't allow to know
 	/// what is the last selected item. events_selected() update it
-	std::set<QListViewItem *> selected_events;
-	QListViewItem * current_event;
+	std::set<Q3ListViewItem *> selected_events;
+	Q3ListViewItem * current_event;
 
 	/// current config
 	config_setting config;

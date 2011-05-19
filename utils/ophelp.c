@@ -71,10 +71,12 @@ static void word_wrap(int indent, int *column, char *msg)
 			printf("\n%*s", indent, "");
 			*column = indent;
 		}
-		printf("%.*s ", wlen, msg);
+		printf("%.*s", wlen, msg);
 		*column += wlen + 1;
 		msg += wlen;
 		msg += strspn(msg, " ");
+		if (*msg)
+			putchar(' ');
 	}
 }
 
@@ -128,7 +130,7 @@ static void help_for_event(struct op_event * event)
 	printf(")\n\t");
 	column = 8;
 	word_wrap(8, &column, event->desc);
-	snprintf(buf, sizeof buf, "(min count: %d)", event->min_count);
+	snprintf(buf, sizeof buf, " (min count: %d)", event->min_count);
 	word_wrap(8, &column, buf);
 	putchar('\n');
 
@@ -143,6 +145,21 @@ static void help_for_event(struct op_event * event)
 			       event->unit->um[j].value);
 			column = 14;
 			word_wrap(14, &column, event->unit->um[j].desc);
+			if (event->unit->um[j].extra) {
+				u32 extra = event->unit->um[j].extra;
+
+				word_wrap(14, &column, " (extra:");
+				if (extra & EXTRA_EDGE)
+					word_wrap(14, &column, " edge");
+				if (extra & EXTRA_INV)
+					word_wrap(14, &column, " inv");
+				if ((extra >> EXTRA_CMASK_SHIFT) & EXTRA_CMASK_MASK) {
+					snprintf(buf, sizeof buf, " cmask=%x",
+						 (extra >> EXTRA_CMASK_SHIFT) & EXTRA_CMASK_MASK);
+					word_wrap(14, &column, buf);
+				}
+				word_wrap(14, &column, ")");
+			}
 			putchar('\n');
 		}
 	}
@@ -166,6 +183,8 @@ static void check_event(struct parsed_event * pev,
 				pev->name);
 		exit(EXIT_FAILURE);
 	}
+
+	op_resolve_unit_mask(pev, NULL);
 
 	ret = op_check_events(0, event->val, pev->unit_mask, cpu_type);
 
@@ -197,6 +216,7 @@ static void resolve_events(void)
 	count = parse_events(parsed_events, num_chosen_events, chosen_events);
 
 	for (i = 0; i < count; ++i) {
+	        op_resolve_unit_mask(&parsed_events[i], NULL);
 		for (j = i + 1; j < count; ++j) {
 			struct parsed_event * pev1 = &parsed_events[i];
 			struct parsed_event * pev2 = &parsed_events[j];
@@ -255,7 +275,6 @@ static void resolve_events(void)
 
 static void show_unit_mask(void)
 {
-	struct op_event * event;
 	size_t count;
 
 	count = parse_events(parsed_events, num_chosen_events, chosen_events);
@@ -264,16 +283,27 @@ static void show_unit_mask(void)
 		exit(EXIT_FAILURE);
 	}
 
-	event = find_event_by_name(parsed_events[0].name, 0, 0);
+	op_resolve_unit_mask(parsed_events, NULL);
+	if (parsed_events[0].unit_mask_name)
+		printf("%s\n", parsed_events[0].unit_mask_name);
+	else
+		printf("%d\n", parsed_events[0].unit_mask);
+}
 
-	if (!event) {
-		fprintf(stderr, "No such event found.\n");
+static void show_extra_mask(void)
+{
+	size_t count;
+	unsigned extra = 0;
+
+	count = parse_events(parsed_events, num_chosen_events, chosen_events);
+	if (count > 1) {
+		fprintf(stderr, "More than one event specified.\n");
 		exit(EXIT_FAILURE);
 	}
 
-	printf("%d\n", event->unit->default_mask);
+	op_resolve_unit_mask(parsed_events, &extra);
+	printf ("%d\n", extra);
 }
-
 
 static void show_default_event(void)
 {
@@ -293,6 +323,7 @@ static int get_cpu_type;
 static int check_events;
 static int unit_mask;
 static int get_default_event;
+static int extra_mask;
 
 static struct poptOption options[] = {
 	{ "cpu-type", 'c', POPT_ARG_STRING, &cpu_string, 0,
@@ -311,6 +342,8 @@ static struct poptOption options[] = {
 	   "show version", NULL, },
 	{ "xml", 'X', POPT_ARG_NONE, &want_xml, 0,
 	   "list events as XML", NULL, },
+	{ "extra-mask", 'E', POPT_ARG_NONE, &extra_mask, 0,
+	  "print extra mask for event", NULL, },
 	POPT_AUTOHELP
 	{ NULL, 0, 0, NULL, 0, NULL, NULL, },
 };
@@ -412,13 +445,18 @@ int main(int argc, char const * argv[])
 
 	events = op_events(cpu_type);
 
-	if (!chosen_events && (unit_mask || check_events)) {
+	if (!chosen_events && (unit_mask || check_events || extra_mask)) {
 		fprintf(stderr, "No events given.\n");
 		exit(EXIT_FAILURE);
 	}
 
 	if (unit_mask) {
 		show_unit_mask();
+		exit(EXIT_SUCCESS);
+	}
+
+	if (extra_mask) {
+		show_extra_mask();
 		exit(EXIT_SUCCESS);
 	}
 
@@ -497,6 +535,7 @@ int main(int argc, char const * argv[])
 	case CPU_CORE_I7:
 	case CPU_NEHALEM:
 	case CPU_WESTMERE:
+	case CPU_SANDYBRIDGE:
 	case CPU_ATOM:
 		event_doc =
 			"See Intel Architecture Developer's Manual Volume 3B, Appendix A and\n"
@@ -550,6 +589,18 @@ int main(int argc, char const * argv[])
 		event_doc =
 			"See Cortex-A8 Technical Reference Manual\n"
 			"Cortex A8 DDI (ARM DDI 0344B, revision r1p1)\n";
+		break;
+
+	case CPU_ARM_SCORPION:
+		event_doc =
+			"See ARM Architecture Reference Manual ARMv7-A and ARMv7-R Edition\n"
+			"Scorpion Processor Family Programmer's Reference Manual (PRM)\n";
+		break;
+
+	case CPU_ARM_SCORPIONMP:
+		event_doc =
+			"See ARM Architecture Reference Manual ARMv7-A and ARMv7-R Edition\n"
+			"Scorpion Processor Family Programmer's Reference Manual (PRM)\n";
 		break;
 
 	case CPU_ARM_V7_CA9:
@@ -695,8 +746,11 @@ int main(int argc, char const * argv[])
 	sprintf(title, "oprofile: available events for CPU type \"%s\"\n\n", pretty);
 	if (want_xml)
 		open_xml_events(title, event_doc, cpu_type);
-	else
+	else {
 		printf("%s%s", title, event_doc);
+		printf("For architectures using unit masks, you may be able to specify\n"
+		       "unit masks by name.  See 'opcontrol' man page for more details.\n\n");
+	}
 
 	list_for_each(pos, events) {
 		struct op_event * event = list_entry(pos, struct op_event, event_next);

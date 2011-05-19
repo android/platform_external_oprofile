@@ -15,6 +15,8 @@ check_PROGRAMS = \
 	alloc_counter_tests \
 	mangle_tests
 
+EXTRA_DIST = utf8_checker.sh
+
 cpu_type_tests_SOURCES = cpu_type_tests.c
 cpu_type_tests_LDADD = ${COMMON_LIBS}
 
@@ -30,4 +32,4 @@ load_events_files_tests_LDADD = ${COMMON_LIBS}
 mangle_tests_SOURCES = mangle_tests.c
 mangle_tests_LDADD = ${COMMON_LIBS}
 
-TESTS = ${check_PROGRAMS}
+TESTS = ${check_PROGRAMS} utf8_checker.sh

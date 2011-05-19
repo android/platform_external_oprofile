@@ -20,6 +20,7 @@ struct parsed_event {
 	char * name;
 	int count;
 	int unit_mask;
+	char * unit_mask_name;
 	int kernel;
 	int user;
 	int unit_mask_valid;

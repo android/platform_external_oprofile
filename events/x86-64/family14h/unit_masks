@@ -1,30 +1,246 @@
-# AMD Generic unit masks
+# AMD Family 14 processor performance unit masks
 #
 # Copyright OProfile authors
-# Copyright (c) 2006-2010 Advanced Micro Devices
+# Copyright (c) 2006-2011 Advanced Micro Devices
 # Contributed by Ray Bryant <raybry at amd.com>,
 #		Jason Yeh <jason.yeh at amd.com>
 #		Suravee Suthikulpanit <suravee.suthikulpanit at amd.com>
+#		Paul Drongowski <paul.drongowski at amd.com>
 #
-# Revision: 1.0
+# Sources: BIOS and Kernel Developer's Guide for AMD Family 14h Processors,
+#          Publication# 43170, Revision 3.04, Feb 16, 2011
 #
-# ChangeLog: 
-#	1.0: 30 August 2010.
-#	- Initial revision
+#          Software Optimization Guide for AMD Family 10h and Family 12h Processors,
+#          Publication# 40546, Revision 3.13, February 2011
+#          (Note: For IBS Derived Performance Events)
 #
-name:zero type:mandatory default:0x0
-	0x0 No unit mask
-name:moesi type:bitmask default:0x1f
-	0x01 (I)nvalid cache state
-	0x02 (S)hared cache state
-	0x04 (E)xclusive cache state
-	0x08 (O)wner cache state
-	0x10 (M)odified cache state
-	0x1f All cache states
+# Revision: 1.2
+#
+# ChangeLog:
+#	1.2: 11 March 2011
+# 	- Update to BKDG Rev.3.04
+#
+#	1.1: 25 January 2011.
+#	- Update to BKDG Revision 3.00
+#       - Update minimum value for RETIRED_UOPS
+#
+#	1.0: 29 November 2010.
+# 	- Preliminary version
+name:zero type:mandatory default:0x00
+	0x00 No unit mask
+name:fpu_ops type:bitmask default:0x03
+	0x01 Pipe0 (fadd, imul, mmx) ops
+	0x02 Pipe1 (fmul, store, mmx) ops
+	0x03 All ops
+name:sse_ops type:bitmask default:0x7f
+	0x01 Single Precision add/subtract ops
+	0x02 Single precision multiply ops
+	0x04 Single precision divide/square root ops
+	0x08 Double precision add/subtract ops
+	0x10 Double precision multiply ops
+	0x20 Double precision divide/square root ops
+	0x40 OP type: 0=uops 1=FLOPS
+name:move_ops type:bitmask default:0x0c
+	0x04 All other merging move uops
+	0x08 All other move uops
+name:serial_ops type:bitmask default:0x0f
+	0x01 SSE bottom-executing uops retired
+	0x02 SSE bottom-serializing uops retired
+	0x04 x87 bottom-executing uops retired
+	0x08 x87 bottom-serializing uops retired
+name:retired_x87_fp type:bitmask default:0x07
+	0x01 Add/subtract ops
+	0x02 Multiply ops
+	0x04 Divide and FSQRT ops
+name:segregload type:bitmask default:0x7f
+	0x01 ES register
+	0x02 CS register
+	0x04 SS register
+	0x08 DS register
+	0x10 FS register
+	0x20 GS register
+	0x40 HS register
+name:lock_ops type:bitmask default:0x07
+	0x01 Number of locked instructions executed
+	0x02 Number cycles to acquire bus lock
+	0x04 Number of cycles to unlock cache line (not including cache miss)
+name:store_to_load type:bitmask default:0x07
+	0x01 Address mismatches (starting byte not the same)
+	0x02 Store is smaller than load
+	0x04 Misaligned
 name:moess type:bitmask default:0x1e
-	0x01 Refill from northbridge
-	0x02 Shared-state line from L2
-	0x04 Exclusive-state line from L2
-	0x08 Owner-state line from L2
-	0x10 Modified-state line from L2
-	0x1e All cache states except refill from northbridge
+	0x01 Non-cacheable return of data
+	0x02 Shared
+	0x04 Exclusive
+	0x08 Owned
+	0x10 Modified
+	0x1e All cache states except non-cacheable
+name:moesi type:bitmask default:0x1f
+	0x01 Non-cacheable read data
+	0x02 Shared
+	0x04 Exclusive
+	0x08 Owned
+	0x10 Modified
+	0x1f All cache states
+name:moesi_gh type:bitmask default:0x1f
+	0x01 Evicted from probe
+	0x02 Shared eviction
+	0x04 Exclusive eviction
+	0x08 Owned eviction
+	0x10 Modified eviction
+name:l1_l2_dtlb_miss type:bitmask default:0x0f
+	0x01 Count stores that miss L1TLB
+	0x02 Count loads that miss L1TLB
+	0x04 Count stores that miss L2TLB
+	0x08 Count loads that miss L2TLB
+name:prefetch type:bitmask default:0x07
+	0x01 Load (Prefetch, PrefetchT0/T1/T2)
+	0x02 Store (PrefetchW)
+	0x04 NTA (PrefetchNTA)
+name:l1_dtlb_hit type:bitmask default:0x03
+	0x01 L1 4K TLB hit
+	0x02 L1 2M TLB hit
+name:soft_prefetch type:bitmask default:0x0f
+	0x01 Software prefetch hit in the data cache
+	0x02 Software prefetch hit a pending fill
+	0x04 Software prefetches that don't get a MAB
+	0x08 Software prefetch hit in L2
+name:memreqtype type:bitmask default:0x83
+	0x01 Requests to non-cacheable (UC) memory
+	0x02 Requests to write-combining (WC) memory
+	0x80 Streaming store (SS) requests
+name:mab_buffer type:bitmask default:0x00
+	0x00 DC miss buffer 0
+	0x01 DC miss buffer 1
+	0x02 DC miss buffer 2
+	0x03 DC miss buffer 3
+	0x04 DC miss buffer 4
+	0x05 DC miss buffer 5
+	0x06 DC miss buffer 6
+	0x07 DC miss buffer 7
+	0x08 IC miss buffer 0
+	0x09 IC miss buffer 1
+	0x0a Any DC miss buffer
+	0x0b Any IC miss buffer
+name:systemreadresponse type:bitmask default:0x1f
+	0x01 Exclusive
+	0x02 Modified
+	0x04 Shared
+	0x08 Owned
+	0x10 Data Error
+	0x20 Change-to-Dirty success
+	0x40 Uncacheable
+name:l2_internal type:bitmask default:0x0b
+	0x01 IC fill
+	0x02 DC fill
+	0x08 Tag snoop request
+name:l2_req_miss type:bitmask default:0x03
+	0x01 IC fill
+	0x02 DC fill
+name:l2_fill type:bitmask default:0x03
+	0x01 L2 fills (victims from L1 caches)
+	0x02 L2 writebacks to system
+	0x04 IC attribute writes which access the L2
+	0x08 IC attribute writes which store into the L2
+name:pdc_miss type:bitmask default:0x77
+	0x01 Host: PDE Level
+	0x02 Host: PDPE Level
+	0x04 Host: PML4E Level
+	0x10 Guest: PDE Level
+	0x20 Guest: PDPE Level
+	0x40 Guest: PML4E Level
+name:l1_l2_itlb_miss type:bitmask default:0x03
+	0x01 Instruction fetches to a 4K page
+	0x02 Instruction fetches to a 2M page
+name:icache_invalidated type:bitmask default:0x03
+	0x01 IC invalidate due to an LS probe
+	0x02 IC invalidate due to a BU probe
+name:fpu_instr type:bitmask default:0x03
+	0x01 x87 or MMX(tm) instruction was retired
+	0x02 SSE floating point instruction was retired (SSE, SSE2, SSE3, MNI)
+name:fpu_exceptions type:bitmask default:0x0f
+	0x01 x87 reclass microfaults
+	0x02 SSE retype microfaults
+	0x04 SSE reclass microfaults
+	0x08 SSE and x87 microtraps
+name:page_access type:bitmask default:0xc7
+	0x01 DCT0 Page Hit
+	0x02 DCT0 Page Miss
+	0x04 DCT0 Page Conflict
+	0x40 Write request
+	0x80 Read request
+name:mem_page_overflow type:bitmask default:0x01
+	0x01 DCT0 Page Table Overflow
+	0x02 DCT0 Number of stale table entry hits
+	0x04 DCT0 Page table idle cycle limit incremented
+	0x08 DCT0 Page table idle cycle limit decremented
+	0x10 DCT0 Page table is closed due to row inactivity
+name:slot_missed type:bitmask default:0x50
+	0x10 DCT0 RBD
+	0x40 DCT0 Prefetch
+name:turnaround type:bitmask default:0x03
+	0x01 DCT0 read-to-write turnaround
+	0x02 DCT0 write-to-read turnaround
+name:saturation type:bitmask default:0x0c
+	0x04 D18F2x94[DcqBypassMax] counter reached
+	0x08 Bank closed due to conflict with outstanding request in RBD queue
+name:thermal_status type:bitmask default:0xe5
+	0x01 MEMHOT_L assertions
+	0x04 Number of times the HTC transitions from inactive to active
+	0x20 Number of clocks HTC P-state is inactive
+	0x40 Number of clocks HTC P-state is active
+	0x80 PROCHOT_L asserted by external source and caused P-state change
+name:cpiorequests type:bitmask default:0x08
+	0x01 IO to IO
+	0x02 IO to Mem
+	0x04 CPU to IO
+	0x08 CPU to Mem
+name:cacheblock type:bitmask default:0x3d
+	0x01 Victim Block (Writeback)
+	0x04 Read Block (Dcache load miss refill)
+	0x08 Read Block Shared (Icache refill)
+	0x10 Read Block Modified (Dcache store miss refill)
+	0x20 Change-to-Dirty (first store to clean block already in cache)
+name:sizecmds type:bitmask default:0x3f
+	0x01 Non-Posted SzWr Byte (1-32 bytes)
+	0x02 Non-Posted SzWr DW (1-16 doublewords)
+	0x04 Posted SzWr Byte (1-32 bytes)
+	0x08 Posted SzWr DW (1-16 doublewords)
+	0x10 SzRd Byte (4 bytes)
+	0x20 SzRd DW (1-16 doublewords)
+name:probe type:bitmask default:0xbf
+	0x01 Probe miss
+	0x02 Probe hit clean
+	0x04 Probe hit dirty without memory cancel
+	0x08 Probe hit dirty with memory cancel
+	0x10 Upstream high priority reads
+	0x20 Upstream low priority reads
+	0x80 Upstream low priority writes
+name:gart type:bitmask default:0x70
+	0x10 DEV hit
+	0x20 DEV miss
+	0x40 DEV error
+name:mem_control_request type:bitmask default:0x78
+	0x08 32 Bytes Sized Writes
+	0x10 64 Bytes Sized Writes
+	0x20 32 Bytes Sized Reads
+	0x40 64 Byte Sized Reads
+name:sideband_signals type:bitmask default:0x1e
+	0x02 STOPGRANT
+	0x04 SHUTDOWN
+	0x08 WBINVD
+	0x10 INVD
+name:interrupt_events type:bitmask default:0xff
+	0x01 Fixed and LPA
+	0x02 LPA
+	0x04 SMI
+	0x08 NMI
+	0x10 INIT
+	0x20 STARTUP
+	0x40 INT
+	0x80 EOI
+name:ibs_op type:bitmask default:0x01
+	0x00 Using IBS OP cycle count mode
+	0x01 Using IBS OP dispatch count mode
+	0x02 Enable IBS OP Memory Access Log
+	0x04 Enable IBS OP Branch Target Address Log

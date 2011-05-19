@@ -199,7 +199,6 @@ name:machine_clears type:bitmask default:0x01
 name:mem_inst_retired type:bitmask default:0x01
 	0x01 loads Instructions retired which contains a load (Precise Event)
 	0x02 stores Instructions retired which contains a store (Precise Event)
-	0x10 latency_above_threshold_0 Memory instructions retired above 0 clocks (Precise Event) (MSR_INDEX: 0x03F6 MSR_VALUE: 0x0000)
 name:mem_load_retired type:bitmask default:0x01
 	0x01 l1d_hit Retired loads that hit the L1 data cache (Precise Event)
 	0x02 l2_hit Retired loads that hit the L2 cache (Precise Event)

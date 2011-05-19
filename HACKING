@@ -79,8 +79,8 @@ m4/
 Tools
 -----
 
-You'll need autoconf 2.13+ and automake 2.5+ when using CVS. Don't forget to
-autogen.sh first.
+You'll need autoconf 2.13+ and automake 2.5+ when built from a Git repository.
+Don't forget to autogen.sh first.
 
 We still currently support gcc 2.91.66. Please bear this in mind.
 
@@ -88,27 +88,142 @@ Shell Scripts
 -------------
 
 Any shell scripts should aim to be as compatible as possible with different
-shells and "bashisms" etc. should not be used. Busybox is often used instead 
+shells and "bashisms" etc. should not be used. Busybox is often used instead
 of bash on embedded devices for example.
 
-Making patches, commit rights
------------------------------
+Use of Git
+----------
 
-Patches should be in diff -u format, appliable by patch -p1 in the top-level
-source directory. Patches should not include changes to generated files.
+The oprofile project uses the Git version control system. Since Git may be
+new to some contributors, this section will provide a "quick start" for Git.
 
-Even trivial patches must have a change log entry in the usual format (see
-ChangeLog). Refer to bug numbers in the change log if relevant.
+Good online documentation for Git can be found here:
+	http://progit.org/book/
+	http://book.git-scm.com
+
+Install Git if needed, and configure your user name, and email address:
+	git config --global user.name "Your Name"
+	git config --global user.email "your_email@someplace.com"
+
+Get a local copy of the oprofile repository:
+	git clone git://oprofile.git.sourceforge.net/gitroot/oprofile/oprofile
+
+Update your local repo to the latest commits, whenever needed:
+	git pull
+
+Edit files to make your change. You can review your changed files with:
+	git diff
+	git status
+
+Add the files that you changed to Git's index:
+	git add file1 file2
+	git add dir1/file3 ...
+
+Note that you must add any file that has changed, regardless of whether
+it was added before. This process is called "staging" your changes.
+
+Verify that the staged changes look correct to you:
+	git status
+	git diff --cached
+
+Commit the change (with -s option to add the "signed-off-by" field):
+	git commit -s
+
+Provide a detailed commit message: a one-line summary, a blank line, and
+as much detail describing the change as you think is necessary.
+
+Review your committed change, if desired:
+	git show
+
+When you have finished these steps, you have a local commit in your local
+repository. The next section describes how to submit your patch.
+
+This section has described making changes on your local master branch. It is
+much better practice to create a new branch for your changes, and leave the
+master branch unmodified. This is quite easy in git, and highly recommended.
+The documentation referenced above explains how to do this.
+
+Making patches
+--------------
+
+Patches should be in diff -u format and must apply cleanly using "patch -p1"
+in the top-level source directory. Patches should not include changes to
+generated files.
+
+Git has tools to help with the creation and submission of patches in this
+format.
+
+You can create a patch-file from the most recent commit using:
+	git format-patch -n HEAD^..
+
+This will create local patch file with a name derived from your commit
+message similar to this:
+	0001-Update-HACKING-file.patch
+
+You can read this file into your email client and send it to the list. Or you
+can have git send it for you:
+	git send-email 0001-Update-HACKING-file.patch
+
+It will prompt you for addresses, or you can give those as command-line
+options. Depending on how email is configured at your location, you may need
+to specify an SMTP server using the options:
+	--smtp-server=<smtp-server>
+	--smtp-server-port=<port>
+
+Patches should be sent to: oprofile-list@lists.sf.net
+
+There are many useful options. See the Git documentation.
+
+Applying patches
+----------------
+
+You can apply these patches manually using the "patch" command in the usual
+way, or you can use "git apply" or "git am". See the git documentation.
+
+To get patches from the mailing list into Git, you first need to get the data
+out of your email client and into a file. Some mail clients corrupt patches by
+deleting leading spaces or adding carriage returns to line-endings. Sometimes
+copy and paste into an editor works better than direct file save.
+
+You can test if a patch you saved (called patch-file) applies by doing:
+	git apply --check patch-file
+
+You can apply it to your working directory using:
+	git apply patch-file
+
+And you can apply it directly staged to the index ready for commit with:
+	git apply --index patch-file
+
+ChangeLog file
+--------------
+
+The use of the ChangeLog file has been deprecated. You should not modify it.
+Your commit message should include all information that previously would have
+been added to ChangeLog.
+
+Commit rights
+-------------
 
 When you submit a patch, we ask that you include a "Signed-off-by"
 line; for example:
        Signed-off-by: Random J Developer <random@developer.example.org>
 
+This can be inserted by Git when you commit your patch your local repository
+if you add the "-s" option to "git commit".
+
+(If you forget to add it to your commit, you can alternatively add the "-s"
+option to "git format-patch", if you use that command to generate your patch
+file.)
+
 Including this line with your patch implies that you have read and comply with
 the "Developer's Certificate of Origin 1.1" (DCO).  This is the same process
 the kernel community uses to try to ensure the originality of patches.  The
-DCO can be found in <kernel-source>/Documentation/SubmittingPatches, item 11,
-"Sign your work".  For convenience, a copy of the DCO is included below.
+DCO can be found in <kernel-source>/Documentation/SubmittingPatches, item 12,
+"Sign your work".  This file can be found here:
+
+http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=Documentation/SubmittingPatches
+
+For convenience, a copy of the DCO is included below.
 
    Developer's Certificate of Origin 1.1
 
@@ -139,68 +254,37 @@ DCO can be found in <kernel-source>/Documentation/SubmittingPatches, item 11,
 
 
 If you make a change visible to the user in some way, you should check the
-website for any needed changes. Patches to oprofile-www CVS are preferred
+website for any needed changes. Patches to oprofile-www Git repo are preferred
 but a notification of what needs changing is good enough. Any changes that
 affect the docs (man-pages or oprofile.xml) must include documentation updates
 as appropriate. Also see below.
 
-You may after a while be given direct commit rights. You should be
-subscribed to both the main list and the commits mailing list if you do.
-Your cvs commit message only needs to briefly describe what your change
-does - the change log should have the detailed description. Any
-non-trivial change needs approval from either John, Phil or Maynard,
-unless stated otherwise. The CVS tree will freeze occassionally for
-release, in which case no commits are allowed at all without agreement
-of John, Phil, or Maynard. CVS admin changes (-kb, .cvsignore etc.) do
-not need a change log, and neither does changes to TODO. If you make a
-change that affects the user (feature improvement, new feature, bug fix,
-UI change), see the next section.
+You may after a while be given direct commit rights. You should be subscribed
+to both the main list and the commits mailing list if you do. Your git commit
+message must have the detailed description of what your change does. Any
+non-trivial change needs approval from either John, Phil or Maynard, unless
+stated otherwise. The Git repo will freeze occasionally for release, in which
+case no commits are allowed at all without agreement of John, Phil, or
+Maynard. If you make a change that affects the user (feature improvement, new
+feature, bug fix, UI change), see the next section.
 
 The oprofile website
 --------------------
 
-The oprofile website source is stored in the oprofile-www CVS module, excepting
-the doc/ and srcdoc/ directories, which are updated by hand at release time.
-The visible website (http://oprofile.sf.net/) must always describe the last
-*released* version of OProfile, but the CVS contents should be up to date with
-the CVS code. This means that if you make a user-visible change as described
-in the last section, you should update the files in oprofile-www and commit.
-You can do "cvs update" in home/groups/o/op/oprofile/htdocs/cvs on sourceforge
-to get http://oprofile.sf.net/cvs/, so you can check your changes work (and
-validate: see http://www.htmlhelp.com/tools/validator/).
+The oprofile website source is stored in the oprofile-www Git repository,
+excepting the doc/ and srcdoc/ directories, which are are generated from the
+oprofile source code.. The visible website (http://oprofile.sf.net/) must
+always describe the last *released* version of OProfile, but the Git
+repository should be up to date with the latest code. This means that if you
+make a user-visible change as described in the last section, you should update
+the files in oprofile-www and commit.
+
+You can do "git pull" in /home/project-web/oprofile/htdocs/git on sourceforge
+to get http://oprofile.sf.net/git/, from where you can verify that your
+changes work. (Aside from verifying via your browser, you can also validate
+your HTML using http://www.htmlhelp.com/tools/validator/.)
 
 Any user-visible change should have a short description in the file
-release-notes/release-<nextversion> in the oprofile-www CVS module.
+release-notes/release-<nextversion> in the oprofile-www Git repository.
 Do not document bug fixes that were not in the last released version.
 
-CVS branches
-------------
-
-You may need at some point to do your work on a CVS branch, if it's
-particularly invasive. CVS is a PITA in this respect unfortunately. It's
-strongly recommended that you merge changes from the trunk to your branch at
-regular intervals.
-
-To create a branch, create a branch tag :
-
-	cvs rtag -b BRANCH_WHATEVER oprofile
-
-And add a merge tag (in the trunk repository):
-
-	cvs rtag BRANCH_WHATEVER_MERGE oprofile
-
-Now make your changes on the branch as you wish. When you want to merge some
-fixes from the trunk in your branch, do something like this on a branch
-checkout :
-
-	cvs update -j BRANCH_WHATEVER_MERGE -j HEAD
-
-Fix up any conflicts and commit it the changes to the branch. Now move the
-merge tag along for the next merge (in the trunk repository) :
-
-	cvs rtag -F BRANCH_WHATEVER_MERGE oprofile
-
-When the time comes to merge the branch changes back into the trunk, I
-recommend just doing a diff -Naur on the two trees, which will make sure CVS
-hasn't done anything unusual. Don't forget to list your branch on the website
-CVS page.

@@ -33,7 +33,7 @@ http://oprofile.sourceforge.net/doc/install.html.
 
 Quick start :
 
-(If using CVS: ./autogen.sh first. You need automake 1.5 or higher. You
+(If using git: ./autogen.sh first. You need automake 1.5 or higher. You
 can specify a different version, e.g.
 ACLOCAL=aclocal-1.5 AUTOMAKE=automake-1.5 AUTOCONF=autoconf-2.13 AUTOHEADER=autoheader-2.13 ./autogen.sh)
 

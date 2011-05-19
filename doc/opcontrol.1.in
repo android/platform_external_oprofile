@@ -107,7 +107,12 @@ or "default" for the default event. The event is of the form
 count, unit mask, kernel-space counting, user-space counting,
 respectively.  Note that this over-rides all previous events selected;
 if you want two or more counters used simultaneously, you must specify
-them on the same opcontrol invocation.
+them on the same opcontrol invocation. The numerical unit mask
+can also be a string which matches the first word in the unit mask
+description, but only for events with "extra:" parameters shown.
+Unit masks with "extra:" parameters
+.I must
+be specified by first word.
 .br
 .TP
 .BI "--separate="[none,lib,kernel,thread,cpu,all]

@@ -1,16 +1,192 @@
-# AMD Generic unit masks
+# AMD Family 15h processor performance events
 #
 # Copyright OProfile authors
-# Copyright (c) 2006-2010 Advanced Micro Devices
+# Copyright (c) 2006-2011 Advanced Micro Devices
 # Contributed by Ray Bryant <raybry at amd.com>,
 #		Jason Yeh <jason.yeh at amd.com>
 #		Suravee Suthikulpanit <suravee.suthikulpanit at amd.com>
+#		Paul Drongowski <paul.drongowski at amd.com>
 #
-# Revision: 1.0
+# Sources: BIOS and Kernel Developer's Guide for AMD Family 15h Models 00h-0Fh Processors,
+#          Publication# 42301, Revision 1.12, February 16, 2011
+#
+#          Software Optimization Guide for AMD Family 10h and Family 12h Processors,
+#          Publication# 40546, Revision 3.13, February 2011
+#          (Note: For IBS Derived Performance Events)
+#
+# Revision: 1.3
 #
 # ChangeLog: 
-#	1.0: 30 August 2010.
-#	- Initial revision
+# 	1.3: 9 March 2011
+# 	- Update to BKDG Rev 1.12 (still preliminary)
 #
-name:zero type:mandatory default:0x0
-	0x0 No unit mask
+#	1.2: 25 Januray 2011
+#	- Updated to BKDG Rev 1.09 (still preliminary)
+# 	- Update minimum value for RETIRED_UOPS
+#
+#	1.1: 2 December 2010
+#	- Updated to BKDG Rev 1.06 (still preliminary)
+#
+#	1.0: 28 May 2010
+# 	- Preliminary version
+name:zero type:mandatory default:0x00
+	0x00 No unit mask
+name:fpu_ops type:bitmask default:0xff
+	0x01 Total number uops assigned to Pipe 0
+	0x02 Total number uops assigned to Pipe 1
+	0x04 Total number uops assigned to Pipe 2
+	0x08 Total number uops assigned to Pipe 3
+	0x10 Total number dual-pipe uops assigned to Pipe 0
+	0x20 Total number dual-pipe uops assigned to Pipe 1
+	0x40 Total number dual-pipe uops assigned to Pipe 2
+	0x80 Total number dual-pipe uops assigned to Pipe 3
+	0xff All ops
+name:sse_ops type:bitmask default:0xff
+	0x01 Single Precision add/subtract FLOPS
+	0x02 Single precision multiply FLOPS
+	0x04 Single precision divide/square root FLOPS
+	0x08 Single precision multiply-add FLOPS. Multiply-add counts as 2 FLOPS
+	0x10 Double precision add/subtract FLOPS
+	0x20 Double precision multiply FLOPS
+	0x40 Double precision divide/square root FLOPS
+	0x80 Double precision multiply-add FLOPS. Multiply-add counts as 2 FLOPS
+name:move_ops type:bitmask default:0x0c
+	0x01 Number of SSE Move Ops
+	0x02 Number of SSE Move Ops eliminated
+	0x04 Number of Ops that are candidates for optimization
+	0x08 Number of Scalar ops optimized
+name:serial_ops type:bitmask default:0x0f
+	0x01 SSE bottom-executing uops retired
+	0x02 SSE control word mispredict traps due to mispredictions
+	0x04 x87 bottom-executing uops retired
+	0x08 x87 control word mispredict traps due to mispredictions
+name:segregload type:bitmask default:0x7f
+	0x01 ES register
+	0x02 CS register
+	0x04 SS register
+	0x08 DS register
+	0x10 FS register
+	0x20 GS register
+	0x40 HS register
+name:loadq_storeq type:bitmask default:0x03
+	0x01 Cycles that the load buffer is full
+	0x02 Cycles that the store buffer is full
+name:lock_ops type:bitmask default:0x01
+	0x01 Number of locked instructions executed
+	0x04 Cycles spent non-speculative phase (including cache miss penalty)
+	0x08 Cycles waiting for a cache hit (cache miss penalty)
+name:store_to_load type:bitmask default:0x01
+	0x01 Store is smaller than load or different starting byte but partial overlap
+name:dcache_misses type:bitmask default:0x01
+	0x01 First data cache miss or streaming store to a 64B cache line
+	0x02 First streaming store to a 64B cache line
+name:dcache_refills type:bitmask default:0x0b
+	0x01 Fill with good data. (Final valid status is valid)
+	0x02 Early valid status turned out to be invalid
+	0x08 Fill with read data error
+name:unified_tlb_hit type:bitmask default:0x77
+	0x01 4 KB unified TLB hit for data
+	0x02 2 MB unified TLB hit for data
+	0x04 1 GB unified TLB hit for data
+	0x10 4 KB unified TLB hit for instruction
+	0x20 2 MB unified TLB hit for instruction
+	0x40 1 GB unified TLB hit for instruction
+	0x07 All DTLB hits
+	0x70 All ITLB hits
+	0x77 All DTLB and ITLB hits
+name:unified_tlb_miss type:bitmask default:0x77
+	0x01 4 KB unified TLB miss for data
+	0x02 2 MB unified TLB miss for data
+	0x04 1 GB unified TLB miss for data
+	0x10 4 KB unified TLB miss for instruction
+	0x20 2 MB unified TLB miss for instruction
+	0x40 1 GB unified TLB miss for instruction
+	0x07 All DTLB misses
+	0x70 All ITLB misses
+	0x77 All DTLB and ITLB misses
+name:prefetch type:bitmask default:0x07
+	0x01 Load (Prefetch, PrefetchT0/T1/T2)
+	0x02 Store (PrefetchW)
+	0x04 NTA (PrefetchNTA)
+name:soft_prefetch type:bitmask default:0x09
+	0x01 Software prefetch hit in L1 data cache
+	0x08 Software prefetch hit in the L2
+name:memreqtype type:bitmask default:0x83
+	0x01 Requests to non-cacheable (UC) memory
+	0x02 Requests to write-combining (WC) memory
+	0x80 Streaming store (SS) requests
+name:dataprefetch type:bitmask default:0x02
+	0x02 Prefetch attempts
+name:buffer_id type:bitmask default:0x01
+	0x01 MAB ID bit 0
+	0x02 MAB ID bit 1
+	0x04 MAB ID bit 2
+	0x08 MAB ID bit 3
+	0x10 MAB ID bit 4
+	0x20 MAB ID bit 5
+	0x40 MAB ID bit 6
+	0x80 MAB ID bit 7
+name:systemreadresponse type:bitmask default:0x3f
+	0x01 Exclusive
+	0x02 Modified
+	0x04 Shared
+	0x08 Owned
+	0x10 Data Error
+	0x20 Modified unwritten
+name:octword_transfer type:bitmask default:0x01
+	0x01 Octword write transfer
+name:l2_internal type:bitmask default:0x47
+	0x01 IC fill
+	0x02 DC fill
+	0x04 TLB fill (page table walks)
+	0x08 NB probe request
+	0x10 Canceled request
+	0x40 L2 cache prefetcher request
+name:l2_req_miss type:bitmask default:0x17
+	0x01 IC fill
+	0x02 DC fill (includes possible replays, whereas PMCx041 does not)
+	0x04 TLB page table walks
+	0x10 L2 cache prefetcher request
+name:l2_fill type:bitmask default:0x07
+	0x01 L2 fills from system
+	0x02 L2 Writebacks to system (Clean and Dirty)
+	0x04 L2 Clean Writebacks to system
+name:page_size_mismatches type:bitmask default:0x07
+	0x01 Guest page size is larger than host page size when nested paging is enabled
+	0x02 Splintering due to MTRRs, IORRs, APIC, TOMs or other special address region
+	0x04 Host page size is larger than the guest page size
+name:l1_l2_itlb_miss type:bitmask default:0x07
+	0x01 Instruction fetches to a 4K page
+	0x02 Instruction fetches to a 2M page
+	0x04 Instruction fetches to a 1G page
+name:icache_invalidated type:bitmask default:0x0f
+	0x01 Non-SMC invalidating probe that missed on in-flight instructions
+	0x02 Non-SMC invalidating probe that hit on in-flight instructions
+	0x04 SMC invalidating probe that missed on in-flight instructions
+	0x08 SMC invalidating probe that hit on in-flight instructions
+name:fpu_instr type:bitmask default:0x07
+	0x01 x87 instructions
+	0x02 MMX(tm) instructions
+	0x04 SSE instructions (SSE,SSE2,SSE3,SSSE3,SSE4A,SSE4.1,SSE4.2,AVX,XOP,FMA4)
+name:fpu_exceptions type:bitmask default:0x1f
+	0x01 Total microfaults
+	0x02 Total microtraps
+	0x04 Int2Ext faults
+	0x08 Ext2Int faults
+	0x10 Bypass faults
+name:ibs_ops_tagged type:bitmask default:0x01
+	0x01 Number of ops tagged by IBS
+	0x02 Number of ops tagged by IBS that retired
+	0x04 Number of times op could not be tagged by IBS because of previous tagged op that has not retired
+name:ls_dispatch type:bitmask default:0x07
+	0x01 Loads
+	0x02 Stores
+	0x04 Load-op-Stores
+name:l2_prefetcher_trigger type:bitmask default:0x03
+	0x01 Load L1 miss seen by prefetcher
+	0x02 Store L1 miss seen by prefetcher
+name:ibs_op type:bitmask default:0x01
+	0x00 Using IBS OP cycle count mode
+	0x01 Using IBS OP dispatch count mode
+	0x02 Enable IBS OP Memory Access Log
+	0x04 Enable IBS OP Branch Target Address Log

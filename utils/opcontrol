@@ -118,7 +118,7 @@ vecho()
 
 is_tool_available()
 {
-	if which $1 &>/dev/null; then
+	if which $1 > /dev/null 2>&1; then
 		if test -x `which $1`; then
 			return 1
 		fi
@@ -638,12 +638,11 @@ normalise_events()
 			UNIT_MASK=`echo $GOTEVENT | awk -F: '{print $3}'`
 			KERNEL=`echo $GOTEVENT | awk -F: '{print $4}'`
 			USER=`echo $GOTEVENT | awk -F: '{print $5}'`
-			if test -z "$UNIT_MASK"; then
-				TMPEVENT="$EVENT:$COUNT"
-				UNIT_MASK=`$OPHELP --unit-mask $TMPEVENT`
-				if test "$?" != 0; then
-					exit 1
-				fi
+			TMPEVENT="$EVENT:$COUNT:$UNIT_MASK"
+			UNIT_MASK_NAMED="$UNIT_MASK"
+			UNIT_MASK=`$OPHELP --unit-mask $TMPEVENT`
+			if test "$?" != 0; then
+				exit 1
 			fi
 			if test -z "$KERNEL"; then
 				KERNEL=1
@@ -1149,18 +1148,15 @@ set_ctr_param()
 is_non_cell_ppc64_variant()
 {
 	case "$1" in
-		ppc64/*)
-			tmp="${1/cell/CELL}"
-			if test "$1" = "$tmp"; then
-			#No substituion occurred, so cputype is not cell
-				return 1
-			else
-				return 0
-			fi
-			;;
-		*)
-			return 0;
-			;;
+	    ppc64/*cell*)
+		return 0
+		;;
+	    ppc64/*)
+		return 1
+		;;
+	    *)
+		return 0
+		;;
 	esac
 }
 
@@ -1278,7 +1274,7 @@ check_event_mapping_data()
 			fi
 		fi
 	fi
-	len=`echo -n $event_num | wc -m`
+	len=`echo -n $event_num | wc -c`
 	num_chars_in_grpid=`expr $len - 2`
 	GRP_NUM_VAL=`echo | awk '{print substr("'"${event_num}"'",1,"'"${num_chars_in_grpid}"'")}'`
 	if [ "$GRP_NUM_CK_VAL" = "" ] ; then
@@ -1356,6 +1352,10 @@ do_param_setup()
 		set_ctr_param $f enabled 0
 		set_ctr_param $f event 0
 		set_ctr_param $f count 0
+
+		if test -d $MOUNT/$f/extra ; then
+		    set_ctr_param $f extra 0
+		fi
 	done
 
 	# Check if driver has IBS support
@@ -1440,6 +1440,16 @@ do_param_setup()
 				set_ctr_param $CTR kernel $KERNEL
 				set_ctr_param $CTR user $USER
 				set_ctr_param $CTR unit_mask $UNIT_MASK
+
+				EXTRA=`$OPHELP --extra-mask $EVENT:$COUNT:$UNIT_MASK_NAMED`
+				if test "$EXTRA" -ne 0 ; then
+					if ! test -d $MOUNT/$CTR/extra ; then
+						echo >&2 "Warning: $GOTEVENT has extra mask, but kernel does not support extra field"
+						echo >&2 "Please update your kernel or use a different event. Will miscount."
+					else
+						set_ctr_param $CTR extra $EXTRA
+					fi
+				fi
 			fi
 			OPROFILED_EVENTS=${OPROFILED_EVENTS}$EVENT:$EVENT_VAL:
 			OPROFILED_EVENTS=${OPROFILED_EVENTS}$CTR:$COUNT:$UNIT_MASK:

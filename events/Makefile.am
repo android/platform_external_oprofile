@@ -18,6 +18,7 @@ event_files = \
 	i386/core_i7/events i386/core_i7/unit_masks \
 	i386/nehalem/events i386/nehalem/unit_masks \
 	i386/westmere/events i386/westmere/unit_masks \
+	i386/sandybridge/events i386/sandybridge/unit_masks \
 	ia64/ia64/events ia64/ia64/unit_masks \
 	ia64/itanium2/events ia64/itanium2/unit_masks \
 	ia64/itanium/events ia64/itanium/unit_masks \
@@ -44,6 +45,8 @@ event_files = \
 	arm/armv6/events arm/armv6/unit_masks \
 	arm/armv7-common/events arm/armv7-common/unit_masks \
 	arm/armv7/events arm/armv7/unit_masks \
+	arm/armv7-scorpion/events arm/armv7-scorpion/unit_masks \
+	arm/armv7-scorpionmp/events arm/armv7-scorpionmp/unit_masks \
 	arm/armv7-ca9/events arm/armv7-ca9/unit_masks \
 	arm/mpcore/events arm/mpcore/unit_masks \
 	avr32/events avr32/unit_masks \

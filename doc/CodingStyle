@@ -5,7 +5,7 @@ First off, read Linus' CodingStyle in the kernel Documentation/ directory.
 Most of it applies directly. There are a number of other points worth making,
 however.
 
-The script "check_style.py" in the oprofile-tests CVS module can help
+The script "check_style.py" in the oprofile-tests Git module can help
 identify some problems. Note that it generates a lot of false positives,
 as well as false negatives, so be careful in its use. If all else fails,
 use common sense.

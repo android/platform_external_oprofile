@@ -88,6 +88,9 @@ typedef enum {
 	CPU_FAMILY14H, /**< AMD family 14h */
 	CPU_FAMILY15H, /**< AMD family 15h */
 	CPU_WESTMERE, /* Intel Westmere microarchitecture */
+	CPU_ARM_SCORPION, /**< ARM SCORPION */
+	CPU_ARM_SCORPIONMP, /**< ARM SCORPIONMP */
+	CPU_SANDYBRIDGE, /* Intel Sandy-Bridge microarchitecture */
 	MAX_CPU_TYPE
 } op_cpu;
 
