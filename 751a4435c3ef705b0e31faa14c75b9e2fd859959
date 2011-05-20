@@ -1,0 +1,9 @@
+Change-Id: I751a4435c3ef705b0e31faa14c75b9e2fd859959
+Code-Review+2: Ben Cheng <bccheng@android.com>
+Verified+1: Jean-Baptiste Queru <jbq@google.com>
+Code-Review+1: Vikram Dhillon
+Submitted-by: Jean-Baptiste Queru <jbq@google.com>
+Submitted-at: Thu, 29 Apr 2010 07:56:57 -0700
+Reviewed-on: https://review.source.android.com/13859
+Project: platform/external/oprofile
+Branch: refs/heads/master

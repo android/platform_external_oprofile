@@ -1,0 +1,7 @@
+Code-Review+2: Jean-Baptiste Queru <jbq@google.com>
+Verified+1: Mike Lockwood <lockwood%android.com@gtempaccount.com>
+Submitted-by: Mike Lockwood <lockwood%android.com@gtempaccount.com>
+Submitted-at: Fri, 30 Apr 2010 06:51:35 -0700
+Reviewed-on: https://review.source.android.com/14516
+Project: platform/external/oprofile
+Branch: refs/heads/master
