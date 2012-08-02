@@ -51,7 +51,7 @@ static inline unsigned arch_cpuid_1(int code)
             : "ecx", "edx"
         );
 #else
-        asm("cpuid" : "=a" (v.eax) : "a" (code) : "ecx","ebx","edx");
+        asm("cpuid" : "=a" (val) : "a" (code) : "ecx","ebx","edx");
 #endif
         return val;
 }
