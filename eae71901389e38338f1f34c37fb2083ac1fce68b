@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAJ9H//9Yc\u003d",
+        "filename": "opcontrol/opcontrol.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 547,
+      "author": {
+        "id": 1010669
+      },
+      "writtenOn": "2012-10-09T18:47:02Z",
+      "side": 1,
+      "message": "Chris, with your changes, do you think Ben Cheng\u0027s suppression of this SIGHUP is still needed for the problem he addressed?  Or are your changes a proper fix for his problem?",
+      "revId": "eae71901389e38338f1f34c37fb2083ac1fce68b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
