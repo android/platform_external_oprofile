@@ -18,7 +18,7 @@ static inline int cpuid_vendor(char *vnd)
 			unsigned b,d,c;
 		};
 		char v[12];
-	} v;
+	} v = {};
 	unsigned eax;
 #ifdef __PIC__
         __asm__ __volatile__(
