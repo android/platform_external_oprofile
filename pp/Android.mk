@@ -98,6 +98,7 @@ LOCAL_STATIC_LIBRARIES := $(common_libs)
 LOCAL_C_INCLUDES := $(common_host_c_includes)
 LOCAL_CFLAGS := $(common_host_cflags)
 LOCAL_LDLIBS := $(common_ldlibs)
+LOCAL_LDFLAGS += -ldl
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= oparchive
 
