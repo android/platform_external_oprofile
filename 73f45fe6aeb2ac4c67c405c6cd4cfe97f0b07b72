@@ -1,0 +1,8 @@
+Code-Review+2: Ben Cheng <bccheng@android.com>
+Verified+1: Deckard Autoverifier <deckard@android.com>
+Code-Review+1: Duane Sand <duane.sand@imgtec.com>
+Submitted-by: Ben Cheng <bccheng@android.com>
+Submitted-at: Tue, 05 Mar 2013 17:44:43 +0000
+Reviewed-on: https://android-review.googlesource.com/32063
+Project: platform/external/oprofile
+Branch: refs/heads/master
