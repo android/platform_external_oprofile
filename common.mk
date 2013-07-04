@@ -35,14 +35,22 @@ common_target_cflags := $(common_cflags)
 HAVE_LIBBFD := false
 
 ifeq ($(TARGET_ARCH),arm)
-toolchain := prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-linux-androideabi-4.6
+ifeq ($(strip $(TARGET_GCC_VERSION)),)
+    toolchain := prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-linux-androideabi-4.6
+else
+    toolchain := prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-linux-androideabi-$(TARGET_GCC_VERSION)
+endif # TARGET_GCC_VERSION
 common_host_extra_flags := -DANDROID_TARGET_ARM
-endif
+endif # TARGET_ARCH
 
 ifeq ($(TARGET_ARCH),mips)
-toolchain := prebuilts/gcc/$(HOST_PREBUILT_TAG)/mips/mipsel-linux-android-4.6
+ifeq ($(strip $(TARGET_GCC_VERSION)),)
+    toolchain := prebuilts/gcc/$(HOST_PREBUILT_TAG)/mips/mipsel-linux-android-4.6
+else
+    toolchain := prebuilts/gcc/$(HOST_PREBUILT_TAG)/mips/mipsel-linux-android-$(TARGET_GCC_VERSION)
+endif # TARGET_GCC_VERSION
 common_host_extra_flags := -DANDROID_TARGET_MIPS
-endif
+endif # TARGET_ARCH
 
 ifneq ($(filter arm mips,$(TARGET_ARCH)),)
 common_host_c_includes := $(common_c_includes) $(toolchain)/include
