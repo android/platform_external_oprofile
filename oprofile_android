@@ -247,13 +247,18 @@ class Tool:
       opcontrol_args.append('--vmlinux=' + kernel_image)
 
     # Get kernal VMA range.
+    rc, output = self.adb.shell(['echo', '1', '>/proc/sys/kernel/kptr_restrict'], echo=False)
+    if rc != 0:
+      print '* Failed to enable kptr addresses.'
+      print output
+      return 1
     rc, output = self.adb.shell(['cat', '/proc/kallsyms'], echo=False)
     if rc != 0:
       print '* Failed to determine kernel VMA range.'
       print output
       return 1
-    vma_start = re.search('([0-9a-fA-F]{8}) T _text', output).group(1)
-    vma_end = re.search('([0-9a-fA-F]{8}) A _etext', output).group(1)
+    vma_start = re.search('([0-9a-fA-F]{8}) T _s?text', output).group(1)
+    vma_end = re.search('([0-9a-fA-F]{8}) [AT] _etext', output).group(1)
 
     # Setup the profiler.
     rc, output = self.adb.shell(['/system/xbin/opcontrol'] + self._opcontrol_verbose_arg() + [
